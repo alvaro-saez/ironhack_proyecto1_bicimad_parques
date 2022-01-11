@@ -13,7 +13,7 @@ There are 2 main datasources:
 Server name:   sqlironhack
 Database:      BiciMAD
 ```
-> __IMPORTANT =>__ Username and password will be provided in class._
+> __IMPORTANT =>__ Username and password will be provided in class.
 
 
 - **API REST.** We will use the API REST from the [Portal de datos abiertos del Ayuntamiento de Madrid](https://datos.madrid.es/nuevoMadrid/swagger-ui-master-2.2.10/dist/index.html?url=/egobfiles/api.datos.madrid.es.json#/), where you can find the __Catálogo de datos__ with more than 70 datasets.
@@ -32,7 +32,7 @@ You must create a Python App (**Data Pipeline**) that allow their potential user
 | Auditorio Carmen Laforet (Ciudad Lineal)   | Centros Culturales | Calle Jazmin, 46 | Legazpi | Calle Bolívar, 3 |
 | Centro Comunitario Casino de la Reina | Centros municipales de enseñanzas artísticas | Calle Casino, 3 | Chamartin | Calle Rodríguez Jaén, 40 |
 | ...     | ...            | ...        | ...      | ...        |
-> __(*)__ There is a list of datasets each one with different places. A specific dataset will be assigned to every student. 
+> __(*)__ There is a list of datasets each one with different places. A specific dataset will be assigned to each student. 
 
 
 **Your project must meet the following requirements:**
