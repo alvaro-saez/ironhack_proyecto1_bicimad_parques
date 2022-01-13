@@ -1,0 +1,11 @@
+stationId,stationName,address,city,zip_code,total_places,free_places,enabled,reserved_places,geometry_type,geometry_coordinates
+5,Bicipark Recuerdo,"Calle Hiedra, 26",Madrid,28036,13,13,1,0,Point,"[-3.678921, 40.472419]"
+9,Bicipark Recoletos,"Paseo de Recoletos, 2",Madrid,28001,10,-1,0,0,Point,"[-3.692245, 40.420354]"
+12,Bicipark Almagro,"Calle Almagro, 11",Madrid,28010,16,15,1,0,Point,"[-3.692879, 40.430361]"
+22,Bicipark Orense,"Avenida General Perón, 27",Madrid,28020,15,13,1,1,Point,"[-3.693897, 40.452973]"
+25,Bicipark Salamanca,Pl. del Marqués de Salamanca,Madrid,28006,5,5,1,0,Point,"[-3.679172, 40.430315]"
+49,Bicipark Montalban,"Calle de Montalbán, 5",Madrid,28014,16,16,1,0,Point,"[-3.690786, 40.418146]"
+67,Bicipark Villa de Paris,"Calle de Orellana, 23, 21",Madrid,28004,10,9,1,1,Point,"[-3.693698, 40.425608]"
+74,Bicipark Fuente de la Mora,Estación de Fuente de la Mora,Madrid,28050,10,10,1,0,Point,"[-3.6630679, 40.4846838]"
+1154,Bicipark Pitis,"Calle Pau Arroyo del Fresno, 181",Madrid,28049,10,8,1,0,Point,"[-3.7249142, 40.4959425]"
+1169,Bicipark Aviación,Parking Aviación Española,Madrid,28024,10,9,1,0,Point,"[-3.78369522, 40.383491516]"
