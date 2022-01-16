@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[17]:
 
 
 import pandas as pd
@@ -9,21 +9,11 @@ from shapely.geometry import Point
 import geopandas as gpd   # conda install -c conda-forge geopandas
 import numpy as np
 import requests
+#import warnings
+#warnings.filterwarnings('ignore');
 
 
-# In[3]:
-
-
-#parques_municipales_df = pd.read_csv("../datasets/parques_municipales.csv", sep=';')
-
-
-# In[4]:
-
-
-#bicimad_st_df = pd.read_csv("../datasets/bicimad_statios_database.csv", sep=',')
-
-
-# In[11]:
+# In[18]:
 
 
 def datasets_transformados(parques_municipales_df,bicimad_st_df):
@@ -44,14 +34,8 @@ def datasets_transformados(parques_municipales_df,bicimad_st_df):
     return "datasets trasnformados"
 
 
-# In[12]:
+# In[19]:
 
 
 #transform_parques_municipales(parques_municipales_df) 
-
-
-# In[ ]:
-
-
-
 

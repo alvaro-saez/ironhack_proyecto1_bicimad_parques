@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[49]:
 
 
 import pandas as pd
@@ -9,53 +9,14 @@ from shapely.geometry import Point
 import geopandas as gpd   # conda install -c conda-forge geopandas
 import numpy as np
 import requests
-
-
-# In[2]:
-
-
-#parques_municipales_df = pd.read_csv("../datasets/parques_municipales.csv", sep=';')
-
-
-# In[3]:
-
-
-#bicimad_st_df = pd.read_csv("../datasets/bicimad_statios_database.csv", sep=',')
-
-
-# In[4]:
-
-
-"""
-def transform_parques_municipales(parques_municipales_df):
-    parques_municipales_df["Type of Place"] = "Principales parques y jardines municipales"
-    
-    def bicimad_geo_long(geo):
-        geo_clean = geo.replace("[","").replace("]","").split(",")
-        longitud = geo_clean[0].strip()
-        return longitud
-    bicimad_st_df["LONGITUD"] = bicimad_st_df["geometry_coordinates"].apply(bicimad_geo_long)
-    
-    def bicimad_geo_lat(geo):
-        geo_clean = geo.replace("[","").replace("]","").split(",")
-        latitud = geo_clean[1].strip()
-        return latitud
-    bicimad_st_df["LATITUD"] = bicimad_st_df["geometry_coordinates"].apply(bicimad_geo_lat)
-
-    return "datasets trasnformados"
-"""
-
-
-# In[5]:
-
-
-#transform_parques_municipales(parques_municipales_df) 
+#import warnings
+#warnings.filterwarnings('ignore')
 
 
 # #### preparar la tabla final
 # 
 
-# In[13]:
+# In[41]:
 
 
 def preparar_tabla_place(parques_municipales_df):
@@ -73,14 +34,14 @@ def preparar_tabla_place(parques_municipales_df):
     return final_df_place
 
 
-# In[21]:
+# In[42]:
 
 
 #final_df_place = preparar_tabla_place(parques_municipales_df)
 #final_df_place
 
 
-# In[17]:
+# In[43]:
 
 
 def preparar_tabla_bicimad(bicimad_st_df):
@@ -111,29 +72,19 @@ def preparar_tabla_bicimad(bicimad_st_df):
     return final_df_bici
 
 
-# In[22]:
+# In[44]:
 
 
 #final_df_bici = preparar_tabla_bicimad(bicimad_st_df)
 #final_df_bici
 
 
-# In[25]:
+# In[45]:
 
 
 def preparar_tabla_final(final_df_place,final_df_bici):
-    final_df_colnames_total = ["Place of interest","Type of place","Place address","Place distrit","Place neighborhood","Place description","Place transport","Place latitude","Place longitude","mercator place","BiciMAD station","Station location","Station latitude","Station longitude","Station base availability","Station Bikes Availability","mercator station"]
     
-    final_df_list =[]
-    for i in range(len(final_df_place)): #203 filas
-        for e in range(len(final_df_bici)): # 264 filas
-            #raw_number = i*e #53592 filas
-            #final_df.loc[raw_number] = final_df_place.loc[i].append(final_df_bici.loc[e])
-            str_individual = final_df_place.loc[i].append(final_df_bici.loc[e])
-            list_individual = str_individual.tolist()
-            final_df_list.append(list_individual)
-
-    final_df = pd.DataFrame(final_df_list,columns=final_df_colnames_total)
+    final_df = final_df_place.assign(key=1).merge(final_df_bici.assign(key=1), how='outer', on = 'key')
     
     def distance_meters(start,finish):
     # return the distance in metres between to latitude/longitude pair point in degrees (i.e.: 40.392436 / -3.6994487)
@@ -143,12 +94,12 @@ def preparar_tabla_final(final_df_place,final_df_bici):
     
     final_df["Distance Between BiciMAD station and Place of interest"] = final_df.apply(lambda final_df: distance_meters(final_df["mercator place"], final_df["mercator station"]), axis=1)
     
-    final_df_full_info_csv_optimizated = final_df.to_csv("datasets/final_df_full_info_optimizated.csv", sep=',')
+    final_df_full_info_csv_optimizated = final_df.to_csv("datasets/final_df_full_info_optimizated.csv", sep=',',index=False)
     
     return final_df
 
 
-# In[27]:
+# In[46]:
 
 
 #final_df = preparar_tabla_final(final_df_place,final_df_bici)
@@ -158,17 +109,12 @@ def preparar_tabla_final(final_df_place,final_df_bici):
 # #### preparar la tabla minimizada
 # 
 
-# In[34]:
+# In[47]:
 
 
 def preparar_tabla_final_minimizada(final_df):
-    total_distance = final_df["Distance Between BiciMAD station and Place of interest"].tolist()
 
-    total_distance_array = np.array(total_distance).reshape(203,264)
-
-    total_distance_array_min = []
-    for i in total_distance_array:
-        total_distance_array_min.append(i.min())
+    total_distance_array_min = final_df.groupby(["Place of interest"])["Distance Between BiciMAD station and Place of interest"].min().tolist()
 
     list_min=[]
     for i in total_distance_array_min:
@@ -176,23 +122,17 @@ def preparar_tabla_final_minimizada(final_df):
         linea_para_df_list = linea_para_df.values.tolist()[0]
         list_min.append(linea_para_df_list)
 
-    final_df_colnames_total = ["Place of interest","Type of place","Place address","Place distrit","Place neighborhood","Place description","Place transport","Place latitude","Place longitude","mercator place","BiciMAD station","Station location","Station latitude","Station longitude","Station base availability","Station Bikes Availability","mercator station"]
+    final_df_colnames_total = ["Place of interest","Type of place","Place address","Place distrit","Place neighborhood","Place description","Place transport","Place latitude","Place longitude","mercator place","key","BiciMAD station","Station location","Station latitude","Station longitude","Station base availability","Station Bikes Availability","mercator station"]
     final_df_min_distance = pd.DataFrame(list_min, columns=final_df_colnames_total+["Distance Between BiciMAD station and Place of interest"])
     
-    final_df_min_distance_csv_optimizated = final_df_min_distance.to_csv("datasets/final_df_min_distance_optimizated.csv", sep=',')
+    final_df_min_distance_csv_optimizated = final_df_min_distance.to_csv("datasets/final_df_min_distance_optimizated.csv", sep=',',index=False)
     
     return final_df_min_distance
 
 
-# In[36]:
+# In[48]:
 
 
 #final_df_min_distance = preparar_tabla_final_minimizada(final_df)
 #final_df_min_distance
-
-
-# In[ ]:
-
-
-
 
