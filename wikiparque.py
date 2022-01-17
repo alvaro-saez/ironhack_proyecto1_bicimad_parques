@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[13]:
+# In[22]:
 
 
 import pandas as pd
@@ -21,8 +21,10 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import webbrowser
 
-# In[14]:
+
+# In[23]:
 
 
 from p_reporting import p_reporting as rp
@@ -54,7 +56,7 @@ def main(arguments):
     
     
     
-    if not arguments.listado and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email:
+    if not arguments.listado and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters:
         print("Hola, esta es una app informativa sobre los Parques Municipales de la excelentisima Comunidad de Madrid, presidida por nuestra dueña y señora AYUSO.\n Escribe: 'python wikiparque.py -h' para saber todo lo que podemos ofrecerte")
         
     elif arguments.listado:
@@ -123,6 +125,12 @@ def main(arguments):
         bicimad_station_meters2 = rp.bicimad_station_meters(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(bicimad_station_meters2)
+            g_maps_question = input("esta distancia es en linea recta. ¿Quieres saber la distancia exacta en Google Maps. Escribe 'si' o 'no': ")
+            if g_maps_question == "si" or g_maps_question == "SI" or g_maps_question == "Si" or g_maps_question == "sI":
+                url_q_maps_question = rp.open_wikipedia(input_parque,interaction_min_dataset)
+                webbrowser.open(url_q_maps_question)
+            else:
+                print("disfruta del parque")
         else:
             print("Parque mal escrito... busca en Google cachondo")
             
@@ -145,12 +153,6 @@ if __name__ == '__main__':
         main(argument_parser())
     except:
         print("LOCOOOO, ¡ESTATE ATENTO! --> Comando mal escrito, escribe 'python wikiparque.py -h' para volver a ver el conjunto de comandos")
-
-
-# In[16]:
-
-
-#arguments.place_description
 
 
 # In[ ]:

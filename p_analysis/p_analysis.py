@@ -125,6 +125,17 @@ def preparar_tabla_final_minimizada(final_df):
     final_df_colnames_total = ["Place of interest","Type of place","Place address","Place distrit","Place neighborhood","Place description","Place transport","Place latitude","Place longitude","mercator place","key","BiciMAD station","Station location","Station latitude","Station longitude","Station base availability","Station Bikes Availability","mercator station"]
     final_df_min_distance = pd.DataFrame(list_min, columns=final_df_colnames_total+["Distance Between BiciMAD station and Place of interest"])
     
+    def place_maps_func(data):
+        place_maps = "+".join(data.split(" "))
+        return place_maps
+    def g_maps_func(place_maps, bici_maps):
+        g_maps = "https://www.google.com/maps/dir/" + str(place_maps) + "/" + str(bici_maps)
+        return g_maps
+
+    final_df_min_distance["place_maps"] = final_df_min_distance["Place of interest"].apply(place_maps_func)
+    final_df_min_distance["bici_maps"] = final_df_min_distance["Station location"].apply(place_maps_func)
+    final_df_min_distance["g_maps"] = final_df_min_distance.apply(lambda final_df_min_distance: g_maps_func(final_df_min_distance["place_maps"], final_df_min_distance["bici_maps"]), axis=1)
+    
     final_df_min_distance_csv_optimizated = final_df_min_distance.to_csv("datasets/final_df_min_distance_optimizated.csv", sep=',',index=False)
     
     return final_df_min_distance

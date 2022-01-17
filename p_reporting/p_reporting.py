@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[22]:
 
 
 import pandas as pd
@@ -20,10 +20,12 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import webbrowser
+
 
 # #### importar datasets finales
 
-# In[2]:
+# In[37]:
 
 
 #location_min_dataset = "../datasets/final_df_min_distance_optimizated.csv"
@@ -32,7 +34,7 @@ def import_min_dataset(location_min_dataset):
     return interaction_min_dataset
 
 
-# In[3]:
+# In[38]:
 
 
 #interaction_min_dataset = import_min_dataset(location_min_dataset)
@@ -163,6 +165,27 @@ def wikiparque_email_sender(receiver_email,filename):
 #receiver_email = input("escribe tu email: ")
 #filename = "../datasets/final_df_min_distance_optimizated.csv" 
 #wikiparque_email_sender(receiver_email,filename)
+
+
+# In[41]:
+
+
+def open_wikipedia(input_parque,interaction_min_dataset):
+    final_open_maps_url = str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "g_maps"].tolist()[0])
+    return final_open_maps_url
+
+
+# In[46]:
+
+
+#input_parque  = "Vivero de la Casa de Campo"
+#open_wikipedia()
+
+
+# In[47]:
+
+
+#webbrowser.open(open_wikipedia())
 
 
 # In[ ]:
