@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[49]:
+# In[50]:
 
 
 import pandas as pd
@@ -11,6 +11,8 @@ import numpy as np
 import requests
 #import warnings
 #warnings.filterwarnings('ignore')
+import osmnx as ox
+import folium
 
 
 # #### preparar la tabla final
@@ -146,4 +148,20 @@ def preparar_tabla_final_minimizada(final_df):
 
 #final_df_min_distance = preparar_tabla_final_minimizada(final_df)
 #final_df_min_distance
+
+
+# #### open_street_maps
+
+# In[ ]:
+
+
+def open_street_maps(final_df_min_distance):
+    m = folium.Map([40.433462, -3.678595], zoom_start=12)
+    locs = zip(final_df_min_distance["Place latitude"].tolist(), final_df_min_distance["Place longitude"].tolist())
+    for location in locs:
+        #print(location)
+        if "nan" not in str(location):
+            folium.CircleMarker(location=location).add_to(m)
+            m.save('datasets/open_street_df.html')
+    return m
 

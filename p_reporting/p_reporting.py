@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[22]:
+# In[54]:
 
 
 import pandas as pd
@@ -22,10 +22,13 @@ from email.mime.text import MIMEText
 
 import webbrowser
 
+import osmnx as ox
+import folium
+
 
 # #### importar datasets finales
 
-# In[37]:
+# In[58]:
 
 
 #location_min_dataset = "../datasets/final_df_min_distance_optimizated.csv"
@@ -34,7 +37,7 @@ def import_min_dataset(location_min_dataset):
     return interaction_min_dataset
 
 
-# In[38]:
+# In[59]:
 
 
 #interaction_min_dataset = import_min_dataset(location_min_dataset)
@@ -191,5 +194,7 @@ def open_wikipedia(input_parque,interaction_min_dataset):
 # In[ ]:
 
 
-
+def restaurantes_google_maps(input_parque,interaction_min_dataset):
+    final_restaurantes_url = str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "g_maps"].tolist()[0])
+    return final_open_maps_url
 

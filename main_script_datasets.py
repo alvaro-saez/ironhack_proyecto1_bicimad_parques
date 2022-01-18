@@ -39,6 +39,8 @@ if __name__ == "__main__":
         final_df = an.preparar_tabla_final(final_df_place,final_df_bici)
         final_df_min_distance = an.preparar_tabla_final_minimizada(final_df)
 
+        an.open_street_maps(final_df_min_distance)    
+        
         print("exportado con éxito")
         
     main_dataset()

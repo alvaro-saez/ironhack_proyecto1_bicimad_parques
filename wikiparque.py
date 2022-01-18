@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[22]:
+# In[10]:
 
 
 import pandas as pd
@@ -23,6 +23,13 @@ from email.mime.text import MIMEText
 
 import webbrowser
 
+#import fuzzywuzzy
+#from fuzzywuzzy import fuzz
+#from fuzzywuzzy import process
+
+import osmnx as ox
+import folium
+
 
 # In[23]:
 
@@ -33,6 +40,7 @@ def argument_parser():
     parser = argparse.ArgumentParser(description='comandos para obtener información de tus parques favoritos')
     
     parser.add_argument("-l", "--listado", help="listado con todos los nombres de los parques de la Comunidad de Madrid", action='store_true')
+    parser.add_argument("-m", "--maps_parques", help="mapa con todos los parques de la Comunidad de Madrid", action='store_true')
     parser.add_argument("-bs", "--bicimad_station", help="nombre de la estación de BiciMAD más cercana", action='store_true')
     parser.add_argument("-bm", "--bicimad_station_meters", help="distancia a la estación de BiciMAD más cercana", action='store_true')
     parser.add_argument("-ba", "--bicimad_adress", help="dirección de la estación de BiciMAD más cercana", action='store_true')
@@ -56,14 +64,20 @@ def main(arguments):
     interaction_min_dataset = rp.import_min_dataset(location_min_dataset)
     filename = "datasets/final_df_min_distance_optimizated.csv" 
     
-    if not arguments.listado and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes:
+    if not arguments.listado and  not arguments.maps_parques and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes:
         print("Hola, esta es una app informativa sobre los Parques Municipales de la excelentisima Comunidad de Madrid, presidida por nuestra dueña y señora AYUSO.\n Escribe: 'python wikiparque.py -h' para saber todo lo que podemos ofrecerte")
         
     elif arguments.listado:
         print(interaction_min_dataset["Place of interest"])
         print("\n")
         print("Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -h'")
-           
+
+    elif arguments.maps_parques:
+        #rp.open_street_maps(interaction_min_dataset)
+        webbrowser.open("file:///C:/Users/AlvaroSaez/Desktop/ironhack/ih_datamadpt1121_project_m1/datasets/open_street_df.html")
+        print("\n")
+        print("Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -h'")        
+        
     elif arguments.bicimad_station:
         input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         bicimad_station2 = rp.bicimad_station(input_parque,interaction_min_dataset)
