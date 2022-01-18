@@ -42,7 +42,9 @@ def argument_parser():
     parser.add_argument("-pb", "--place_barrio", help="barrio en el que se encuentra el parque", action='store_true')
     parser.add_argument("-pt", "--place_transport", help="transporte público cercano al parque", action='store_true')
     parser.add_argument("-e", "--email", help="escribe 'wikiparque.py -e' para recibir el listado completo de parques y estaciones de BiciMAD en tu email", action='store_true')
-
+    parser.add_argument("-gm", "--google_maps", help="rutas en Google Maps desde tu ubicación hasta tu parque favorito", action='store_true')
+    parser.add_argument("-gi", "--google_maps_img", help="imágenes del parqueen Google Maps desde tu ubicación hasta tu parque favorito", action='store_true')
+    parser.add_argument("-gr", "--place_restaurantes", help="restaurantes cerca de tu parque favorito", action='store_true')
 
     args = parser.parse_args()
     return args
@@ -54,9 +56,7 @@ def main(arguments):
     interaction_min_dataset = rp.import_min_dataset(location_min_dataset)
     filename = "datasets/final_df_min_distance_optimizated.csv" 
     
-    
-    
-    if not arguments.listado and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters:
+    if not arguments.listado and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes:
         print("Hola, esta es una app informativa sobre los Parques Municipales de la excelentisima Comunidad de Madrid, presidida por nuestra dueña y señora AYUSO.\n Escribe: 'python wikiparque.py -h' para saber todo lo que podemos ofrecerte")
         
     elif arguments.listado:
@@ -117,6 +117,11 @@ def main(arguments):
         place_transport2 = rp.place_transport(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(place_transport2)
+            ubicación_place_transport_user = input("Dinos tu ubicación y te mostraremos en Google Maps cuanto tardarías para cada uno de los trasportes públicos: ")
+            ubicación_place_transport_user_formated = "+".join(ubicación_place_transport_user.split(" "))
+            imput_parque_user_formated = "+".join(input_parque.split(" "))
+            url_formated_transport_open_g_maps = "https://www.google.com/maps/dir/" + ubicación_place_transport_user_formated  + "/" + imput_parque_user_formated 
+            webbrowser.open(url_formated_transport_open_g_maps)
         else:
             print("Parque mal escrito... busca en Google cachondo")
 
@@ -143,6 +148,35 @@ def main(arguments):
         else:
             print("email enviado con éxito")  
         
+    elif arguments.google_maps:
+        input_parque = input("¿Cuál es tu parque favorito?: ")
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            ubicación_place_transport_user = input("¿Cuál es tu ubicación?: ")
+            ubicación_place_transport_user_formated = "+".join(ubicación_place_transport_user.split(" "))
+            imput_parque_user_formated = "+".join(input_parque.split(" "))
+            url_formated_transport_open_g_maps = "https://www.google.com/maps/dir/" + ubicación_place_transport_user_formated  + "/" + imput_parque_user_formated 
+            webbrowser.open(url_formated_transport_open_g_maps)
+        else:
+            print("Parque mal escrito... busca en Google cachondo")
+
+    elif arguments.place_restaurantes:
+        input_parque = input("¿Cuál es tu parque favorito?: ")
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            imput_parque_user_formated = "+".join(input_parque.split(" "))
+            url_formated_restaurants_g_maps = "https://www.google.com/maps/search/Restaurantes+cerca+de+" + imput_parque_user_formated  + "/"
+            webbrowser.open(url_formated_restaurants_g_maps)
+        else:
+            print("Parque mal escrito... busca en Google cachondo")
+
+    elif arguments.google_maps_img:
+        input_parque = input("¿Cuál es tu parque favorito?: ")
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            imput_parque_user_formated = "+".join(input_parque.split(" "))
+            url_formated_img_g_maps = "https://www.google.com/search?q=" + imput_parque_user_formated  + "&source=lnms&tbm=isch"
+            webbrowser.open(url_formated_img_g_maps)
+        else:
+            print("Parque mal escrito... busca en Google cachondo")            
+            
     else:
         print("Comando mal escrito, escribe 'python wikiparque.py -h' para volver a ver el conjunto de comandos")     
                   
@@ -153,10 +187,4 @@ if __name__ == '__main__':
         main(argument_parser())
     except:
         print("LOCOOOO, ¡ESTATE ATENTO! --> Comando mal escrito, escribe 'python wikiparque.py -h' para volver a ver el conjunto de comandos")
-
-
-# In[ ]:
-
-
-
 
