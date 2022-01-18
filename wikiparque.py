@@ -65,7 +65,7 @@ def main(arguments):
         print("Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -h'")
            
     elif arguments.bicimad_station:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         bicimad_station2 = rp.bicimad_station(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(bicimad_station2)
@@ -73,7 +73,7 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
             
     elif arguments.bicimad_adress:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         bicimad_adress2 = rp.bicimad_adress(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(bicimad_adress2)
@@ -81,7 +81,7 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
             
     elif arguments.bicimad_bikes:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         bicimad_bikes2 = rp.bicimad_bikes(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(bicimad_bikes2)
@@ -97,7 +97,7 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
             
     elif arguments.place_description:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         place_description2 = rp.place_description(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(place_description2)
@@ -105,7 +105,7 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
             
     elif arguments.place_barrio:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         place_barrio2 = rp.place_barrio(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(place_barrio2)
@@ -113,11 +113,11 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
             
     elif arguments.place_transport:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         place_transport2 = rp.place_transport(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(place_transport2)
-            ubicación_place_transport_user = input("Dinos tu ubicación y te mostraremos en Google Maps cuanto tardarías para cada uno de los trasportes públicos: ")
+            ubicación_place_transport_user = input("Dinos tu ubicación y te mostraremos en Google Maps cuanto tardarías para cada uno de los trasportes públicos: ").strip()
             ubicación_place_transport_user_formated = "+".join(ubicación_place_transport_user.split(" "))
             imput_parque_user_formated = "+".join(input_parque.split(" "))
             url_formated_transport_open_g_maps = "https://www.google.com/maps/dir/" + ubicación_place_transport_user_formated  + "/" + imput_parque_user_formated 
@@ -126,11 +126,11 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
 
     elif arguments.bicimad_station_meters:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         bicimad_station_meters2 = rp.bicimad_station_meters(input_parque,interaction_min_dataset)
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             print(bicimad_station_meters2)
-            g_maps_question = input("esta distancia es en linea recta. ¿Quieres saber la distancia exacta en Google Maps. Escribe 'si' o 'no': ")
+            g_maps_question = input("esta distancia es en linea recta. ¿Quieres saber la distancia exacta en Google Maps. Escribe 'si' o 'no': ").strip()
             if g_maps_question == "si" or g_maps_question == "SI" or g_maps_question == "Si" or g_maps_question == "sI":
                 url_q_maps_question = rp.open_wikipedia(input_parque,interaction_min_dataset)
                 webbrowser.open(url_q_maps_question)
@@ -140,7 +140,7 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
             
     elif arguments.email:
-        receiver_email = input("escribe tu email: ")
+        receiver_email = input("escribe tu email: ").strip()
         try:
             rp.wikiparque_email_sender(receiver_email,filename)
         except:
@@ -149,9 +149,9 @@ def main(arguments):
             print("email enviado con éxito")  
         
     elif arguments.google_maps:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
-            ubicación_place_transport_user = input("¿Cuál es tu ubicación?: ")
+            ubicación_place_transport_user = input("¿Cuál es tu ubicación?: ").strip()
             ubicación_place_transport_user_formated = "+".join(ubicación_place_transport_user.split(" "))
             imput_parque_user_formated = "+".join(input_parque.split(" "))
             url_formated_transport_open_g_maps = "https://www.google.com/maps/dir/" + ubicación_place_transport_user_formated  + "/" + imput_parque_user_formated 
@@ -160,7 +160,7 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
 
     elif arguments.place_restaurantes:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             imput_parque_user_formated = "+".join(input_parque.split(" "))
             url_formated_restaurants_g_maps = "https://www.google.com/maps/search/Restaurantes+cerca+de+" + imput_parque_user_formated  + "/"
@@ -169,7 +169,7 @@ def main(arguments):
             print("Parque mal escrito... busca en Google cachondo")
 
     elif arguments.google_maps_img:
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
             imput_parque_user_formated = "+".join(input_parque.split(" "))
             url_formated_img_g_maps = "https://www.google.com/search?q=" + imput_parque_user_formated  + "&source=lnms&tbm=isch"
