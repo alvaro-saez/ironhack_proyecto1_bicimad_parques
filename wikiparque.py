@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[35]:
+# In[42]:
 
 
 import pandas as pd
@@ -11,8 +11,7 @@ import numpy as np
 import requests
 import argparse
 import warnings
-#warnings.filterwarnings('ignore');
-pd.set_option('display.max_rows', 500)
+warnings.filterwarnings('ignore')
 
 import email, smtplib, ssl
 
@@ -22,10 +21,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import webbrowser
-
-#import fuzzywuzzy
-#from fuzzywuzzy import fuzz
-#from fuzzywuzzy import process
 
 import osmnx as ox
 import folium
@@ -38,15 +33,20 @@ import fuzzywuzzy
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
-
-# In[33]:
-
+from tabulate import tabulate
 
 from p_reporting import p_reporting as rp
-    
+
+pd.set_option('display.max_rows', 500)
+
+
+# In[43]:
+
+
 def argument_parser():
-    parser = argparse.ArgumentParser(description='comandos para obtener información de tus parques favoritos')
+    parser = argparse.ArgumentParser(description='comandos para obtener información de tus parques favoritos',add_help=False)
     
+    parser.add_argument("-help", "--help_app_used", help="restaurantes cerca de tu parque favorito", action='store_true')
     parser.add_argument("-l", "--listado", help="listado con todos los nombres de los parques de la Comunidad de Madrid", action='store_true')
     parser.add_argument("-lpb", "--listado_parques_bicis", help="listado con todos los parques de la Comunidad de Madrid y su respectiva estación de BiciMad más cercana", action='store_true')
     parser.add_argument("-m", "--maps_parques", help="mapa con todos los parques de la Comunidad de Madrid", action='store_true')
@@ -75,31 +75,83 @@ def main(arguments):
     location_speak = "datasets/input_speak.mp3" #deprecated (old voice command location)
     engine = pyttsx3.init(); #for voice command
     
+    argparse_comand_list = ["wikiparque.py -help", "wikiparque.py -l", "wikiparque.py -lpb",  "wikiparque.py -m",  "wikiparque.py -bs",  "wikiparque.py -bm",  "wikiparque.py -ba",  "wikiparque.py -bb",  "wikiparque.py -bd",  "wikiparque.py -pd",  "wikiparque.py -pb",  "wikiparque.py -pt",  "wikiparque.py -e",  "wikiparque.py -gm",  "wikiparque.py -gi",  "wikiparque.py -gr"]
+    argparse_comand_list_help = ["comandos de ayuda para utilizar la app",
+                                 "listado con todos los nombres de los parques de la Comunidad de Madrid",
+                                 "listado con todos los parques de la Comunidad de Madrid y su respectiva estación de BiciMad más cercana",
+                                 "mapa con todos los parques de la Comunidad de Madrid",
+                                 "nombre de la estación de BiciMAD más cercana",
+                                 "distancia a la estación de BiciMAD más cercana",
+                                 "dirección de la estación de BiciMAD más cercana",
+                                 "número de bicis disponibles en la estación de BiciMAD más cercana",
+                                 "base disponible para dejar la bici en la estación de BiciMAD más cercana",
+                                 "descripción del parque",
+                                 "barrio en el que se encuentra el parque",
+                                 "transporte público cercano al parque",
+                                 "para recibir el listado completo de parques y estaciones de BiciMAD en tu email",
+                                 "rutas en Google Maps desde tu ubicación hasta tu parque favorito",
+                                 "imágenes del parqueen Google Maps desde tu ubicación hasta tu parque favorito",
+                                 "restaurantes cerca de tu parque favorito"]
+    argparse_comand_list_df = pd.DataFrame({"command lists":argparse_comand_list,
+                              "commands description":argparse_comand_list_help})
+    
     def fw_ratio(x):
         fw1 = x
         fw2 = input_parque_user
         ratio = fuzz.ratio(input_parque_user.lower().strip(), x.lower().strip())
         return ratio
     
-    if not arguments.listado and  not arguments.listado_parques_bicis and  not arguments.maps_parques and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes:
-        intro = "Hola, esta es una app informativa sobre los Parques Municipales de la excelentisima Comunidad de Madrid, presidida por nuestra dueña y señora AYUSO.\n Escribe: 'python wikiparque.py -h' para saber todo lo que podemos ofrecerte"
+    if not arguments.listado and  not arguments.help_app_used and  not arguments.listado_parques_bicis and  not arguments.maps_parques and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes:
+        intro = "Hola, esta es una app informativa sobre los Parques Municipales de la excelentísima Comunidad de Madrid, presidida por nuestra dueña y señora AYUSO.\n Escribe: 'python wikiparque.py -help' para saber todo lo que podemos ofrecerte"
         print(intro)
         #rp.speak_wikiparque(intro, location_speak)
         engine.say(intro);
         engine.runAndWait();
+        
+    elif arguments.help_app_used:
+        print(tabulate(
+            argparse_comand_list_df,
+            headers=argparse_comand_list_df.columns,
+            floatfmt=".5f",
+            showindex=True,
+            tablefmt="psql",
+            )
+        )
+        #print(interaction_min_dataset["Place of interest"])
+        print("\n")
+        listado_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -help'"
+        print(listado_text)
+        engine.say(listado_text);
+        engine.runAndWait();
 
     elif arguments.listado:
-        print(interaction_min_dataset["Place of interest"])
+        print(tabulate(
+            pd.DataFrame(interaction_min_dataset["Place of interest"]),
+            headers=pd.DataFrame(interaction_min_dataset["Place of interest"]).columns,
+            floatfmt=".5f",
+            showindex=True,
+            tablefmt="psql",
+            )
+        )
+        #print(interaction_min_dataset["Place of interest"])
         print("\n")
-        listado_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -h'"
+        listado_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -help'"
         print(listado_text)
         engine.say(listado_text);
         engine.runAndWait();
         
     elif arguments.listado_parques_bicis:
-        print(interaction_min_dataset[["Place of interest","BiciMAD station"]])
+        print(tabulate(
+            pd.DataFrame(interaction_min_dataset[["Place of interest","BiciMAD station"]]),
+            headers=pd.DataFrame(interaction_min_dataset[["Place of interest","BiciMAD station"]]).columns,
+            floatfmt=".5f",
+            showindex=True,
+            tablefmt="psql",
+            )
+        )
+        #print(interaction_min_dataset[["Place of interest","BiciMAD station"]])
         print("\n")
-        listado_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -h'"
+        listado_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -help'"
         print(listado_text)
         engine.say(listado_text);
         engine.runAndWait();
@@ -108,7 +160,7 @@ def main(arguments):
         #rp.open_street_maps(interaction_min_dataset)
         webbrowser.open("file:///C:/Users/AlvaroSaez/Desktop/ironhack/ih_datamadpt1121_project_m1/datasets/open_street_df.html")
         print("\n")
-        maps_parques_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -h'"
+        maps_parques_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -help'"
         print(maps_parques_text)
         engine.say(maps_parques_text);
         engine.runAndWait();
@@ -426,7 +478,7 @@ def main(arguments):
             engine.runAndWait();            
             
     else:
-        error_wrong_command = "Comando mal escrito, escribe 'python wikiparque.py -h' para volver a ver el conjunto de comandos"     
+        error_wrong_command = "Comando mal escrito, escribe 'python wikiparque.py -help' para volver a ver el conjunto de comandos"     
         print(error_wrong_command)
         engine.say(error_wrong_command);
         engine.runAndWait(); 
@@ -437,7 +489,7 @@ if __name__ == '__main__':
     try:
         main(argument_parser())
     except:
-        error_command_locoo = "¡LOOOCOOOOOO, Comando mal escrito! ¡ESTATE ATENTO!, Escribe 'python wikiparque.py -h' para volver a ver el conjunto de comandos"
+        error_command_locoo = "¡LOCO, Comando mal escrito! ¡ESTATE ATENTO!, Escribe 'python wikiparque.py -help' para volver a ver el conjunto de comandos"
         print(error_command_locoo)
         engine = pyttsx3.init(); #for voice command
         engine.say(error_command_locoo);
