@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[11]:
+# In[35]:
 
 
 import pandas as pd
@@ -33,6 +33,10 @@ import folium
 import gtts
 from playsound import playsound
 import pyttsx3
+
+import fuzzywuzzy
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 
 # In[33]:
@@ -71,6 +75,12 @@ def main(arguments):
     location_speak = "datasets/input_speak.mp3" #deprecated (old voice command location)
     engine = pyttsx3.init(); #for voice command
     
+    def fw_ratio(x):
+        fw1 = x
+        fw2 = input_parque_user
+        ratio = fuzz.ratio(input_parque_user.lower().strip(), x.lower().strip())
+        return ratio
+    
     if not arguments.listado and  not arguments.listado_parques_bicis and  not arguments.maps_parques and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes:
         intro = "Hola, esta es una app informativa sobre los Parques Municipales de la excelentisima Comunidad de Madrid, presidida por nuestra dueña y señora AYUSO.\n Escribe: 'python wikiparque.py -h' para saber todo lo que podemos ofrecerte"
         print(intro)
@@ -106,7 +116,15 @@ def main(arguments):
     elif arguments.bicimad_station:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         bicimad_station2 = rp.bicimad_station(input_parque,interaction_min_dataset)
@@ -123,7 +141,15 @@ def main(arguments):
     elif arguments.bicimad_adress:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         bicimad_adress2 = rp.bicimad_adress(input_parque,interaction_min_dataset)
@@ -140,7 +166,15 @@ def main(arguments):
     elif arguments.bicimad_bikes:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         bicimad_bikes2 = rp.bicimad_bikes(input_parque,interaction_min_dataset)
@@ -157,7 +191,15 @@ def main(arguments):
     elif arguments.bicimad_dejar_bici:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ")
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         bicimad_dejar_bici2 = rp.bicimad_dejar_bici(input_parque,interaction_min_dataset)
@@ -174,7 +216,15 @@ def main(arguments):
     elif arguments.place_description:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         place_description2 = rp.place_description(input_parque,interaction_min_dataset)
@@ -191,7 +241,15 @@ def main(arguments):
     elif arguments.place_barrio:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         place_barrio2 = rp.place_barrio(input_parque,interaction_min_dataset)
@@ -208,7 +266,15 @@ def main(arguments):
     elif arguments.place_transport:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         place_transport2 = rp.place_transport(input_parque,interaction_min_dataset)
@@ -233,7 +299,15 @@ def main(arguments):
     elif arguments.bicimad_station_meters:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         bicimad_station_meters2 = rp.bicimad_station_meters(input_parque,interaction_min_dataset)
@@ -278,7 +352,15 @@ def main(arguments):
     elif arguments.google_maps:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
@@ -298,7 +380,15 @@ def main(arguments):
     elif arguments.place_restaurantes:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
@@ -314,7 +404,15 @@ def main(arguments):
     elif arguments.google_maps_img:
         engine.say("¿Cuál es tu parque favorito?");
         engine.runAndWait();
-        input_parque = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
         engine.say("para" + input_parque);
         engine.runAndWait();
         if input_parque in interaction_min_dataset["Place of interest"].tolist():
