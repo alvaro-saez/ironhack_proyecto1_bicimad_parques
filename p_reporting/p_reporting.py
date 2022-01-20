@@ -162,14 +162,6 @@ def wikiparque_email_sender(receiver_email,filename):
         server.sendmail(sender_email, receiver_email, text)
 
 
-# In[18]:
-
-
-#receiver_email = input("escribe tu email: ")
-#filename = "../datasets/final_df_min_distance_optimizated.csv" 
-#wikiparque_email_sender(receiver_email,filename)
-
-
 # In[41]:
 
 
@@ -178,23 +170,21 @@ def open_wikipedia(input_parque,interaction_min_dataset):
     return final_open_maps_url
 
 
-# In[46]:
-
-
-#input_parque  = "Vivero de la Casa de Campo"
-#open_wikipedia()
-
-
-# In[47]:
-
-
-#webbrowser.open(open_wikipedia())
-
-
 # In[ ]:
 
 
 def restaurantes_google_maps(input_parque,interaction_min_dataset):
     final_restaurantes_url = str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "g_maps"].tolist()[0])
     return final_open_maps_url
+
+
+# In[60]:
+
+
+#en desuso
+def speak_wikiparque(text_speak, location_speak):
+    input_speak = gtts.gTTS(text_speak, lang="es")
+    input_speak.save(location_speak)
+    speak = playsound(location_speak)
+    return speak
 
