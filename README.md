@@ -62,14 +62,22 @@ The best practice is to use the BiciMAD API service beacuse it has information w
 
 ## **MODULES:**
 
-You must create a Python App (**Data Pipeline**) that allow their potential users to find the nearest BiciMAD station to a set of places of interest. The output table should look similar to:
+This Python App (**Data Pipeline**) has 2 main scripts:
 
-| Place of interest | Type of place (*) | Place address | BiciMAD station | Station location |
-|---------|----------|-------|------------|----------|
-| Auditorio Carmen Laforet (Ciudad Lineal)   | Centros Culturales | Calle Jazmin, 46 | Legazpi | Calle Bolívar, 3 |
-| Centro Comunitario Casino de la Reina | Centros municipales de enseñanzas artísticas | Calle Casino, 3 | Chamartin | Calle Rodríguez Jaén, 40 |
-| ...     | ...            | ...        | ...      | ...        |
-> __(*)__ There is a list of datasets each one with different places. A specific dataset will be assigned to each student. 
+- ADMIN SCRIPT called "main_script_dataset.py": It executes the needed code to create the final datasets used bu the user script. It use 3 modules:
+
+   a) p_acquisition: In this script we import all the data needed to create the final dataframes.
+   
+   b) p_wrangling: it transforms the previous dataframes to the right format and number of collumns to be enriched.
+   
+   c) p_analysis: In it we start to apply functions to the final dataframes to obtain geolocation information and to put the final names to their columns
+   
+- USER SCRIPT called "wikiparque.py": This script pretends to establish a conversation with the user to give useful information about the parks of madrid. It use one module:
+   a) p_reporting: 
+       - it imports the final dataframes via CSV, so as we had made all the api cals in the admin script, this script will spend less time to be executed. This is very important to the user experience.
+       - it also has functions which give us the desired value by the customer when she/he writes her/his favourite park
+
+The interaction is expressed using inputs method and ARPARSE, which allows to use commands in the terminal. 
 
 
 **Your project must meet the following requirements:**
