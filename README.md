@@ -122,8 +122,26 @@ def bicimad_api(email,psw):
     
     return bicimad_st_df
 
+- WRANGLING SCRIPT:
 
+def datasets_transformados(parques_municipales_df,bicimad_st_df):
+    #PARQUES MUNICIAPLES DATAFRAME --> we add a static value to use in the main user script
+    parques_municipales_df["Type of Place"] = "Principales parques y jardines municipales"
+    
+    #BICIMAD DATAFRAME --> we extract the Longitude and Latitude
+    def bicimad_geo_long(geo):
+        geo_clean = str(geo).replace("[","").replace("]","").split(",")
+        longitud = geo_clean[0].strip()
+        return longitud
+    bicimad_st_df["LONGITUD"] = bicimad_st_df["geometry_coordinates"].apply(bicimad_geo_long)
+    
+    def bicimad_geo_lat(geo):
+        geo_clean = str(geo).replace("[","").replace("]","").split(",")
+        latitud = geo_clean[1].strip()
+        return latitud
+    bicimad_st_df["LATITUD"] = bicimad_st_df["geometry_coordinates"].apply(bicimad_geo_lat)
 
+    return "transformed datasets with success"
 
 
 
