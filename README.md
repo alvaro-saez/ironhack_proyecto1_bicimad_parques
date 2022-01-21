@@ -253,6 +253,14 @@ def preparar_tabla_final_minimizada(final_df):
     
     return final_df_min_distance
     
- 
- 
+EXTRA: open_street_maps: It is a function to obtain a map with all the parks of Madrid in a single HTML file
 
+def open_street_maps(final_df_min_distance):
+    m = folium.Map([40.433462, -3.678595], zoom_start=12)
+    locs = zip(final_df_min_distance["Place latitude"].tolist(), final_df_min_distance["Place longitude"].tolist())
+    for location in locs:
+        #print(location)
+        if "nan" not in str(location):
+            folium.CircleMarker(location=location).add_to(m)
+            m.save('datasets/open_street_df.html')
+    return m
