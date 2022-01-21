@@ -8,9 +8,42 @@ The current proyect consist on simulate the experience of an app through python 
 
 It has 16 terminal commands to interact with the app asking for useful information:
 
-0 - wikiparque.py -help  -->  comandos de ayuda para utilizar la app                                                                  |
+   | command lists       | commands description                                                                                    |
+   
+   
+|  0 | wikiparque.py -help | comandos de ayuda para utilizar la app                                                                  |
 
-1 - wikiparque.py
+|  1 | wikiparque.py -l    | listado con todos los nombres de los parques de la Comunidad de Madrid                                  |
+
+|  2 | wikiparque.py -lpb  | listado con todos los parques de la Comunidad de Madrid y su respectiva estación de BiciMad más cercana |
+
+|  3 | wikiparque.py -m    | mapa con todos los parques de la Comunidad de Madrid                                                    |
+
+|  4 | wikiparque.py -bs   | nombre de la estación de BiciMAD más cercana                                                            |
+
+|  5 | wikiparque.py -bm   | distancia a la estación de BiciMAD más cercana                                                          |
+
+|  6 | wikiparque.py -ba   | dirección de la estación de BiciMAD más cercana                                                         |
+
+|  7 | wikiparque.py -bb   | número de bicis disponibles en la estación de BiciMAD más cercana                                       |
+
+|  8 | wikiparque.py -bd   | base disponible para dejar la bici en la estación de BiciMAD más cercana                                |
+
+|  9 | wikiparque.py -pd   | descripción del parque                                                                                  |
+
+| 10 | wikiparque.py -pb   | barrio en el que se encuentra el parque                                                                 |
+
+| 11 | wikiparque.py -pt   | transporte público cercano al parque                                                                    |
+
+| 12 | wikiparque.py -e    | para recibir el listado completo de parques y estaciones de BiciMAD en tu email                         |
+
+| 13 | wikiparque.py -gm   | rutas en Google Maps desde tu ubicación hasta tu parque favorito                                        |
+
+| 14 | wikiparque.py -gi   | imágenes del parque                                                                                     |
+
+| 15 | wikiparque.py -gr   | restaurantes cerca de tu parque favorito                                                                |
+
+| 16 | wikiparque.py -tr   | videos random que se irán actualizando de celebridades usando los parques de la Comunidad de Madrid
 
 ## **Data:**
 
