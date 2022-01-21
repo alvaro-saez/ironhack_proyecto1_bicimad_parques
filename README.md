@@ -6,9 +6,10 @@ Ironhack Madrid - Data Analytics Part Time - November 2021 - Project Module 1
 
 The current proyect consist on simulate the experience of an app through python code via Terminal UI. This "app" is about information around the Parks of Madrid.
 
-It has 16 terminal commands to interact with the app asking for useful inforamtion:
+It has 16 terminal commands to interact with the app asking for useful information:
 
-|  0 | wikiparque.py -help | comandos de ayuda para utilizar la app                                                                  |
+0 - wikiparque.py -help
+comandos de ayuda para utilizar la app                                                                  |
 |  1 | wikiparque.py -l    | listado con todos los nombres de los parques de la Comunidad de Madrid                                  |
 |  2 | wikiparque.py -lpb  | listado con todos los parques de la Comunidad de Madrid y su respectiva estación de BiciMad más cercana |
 |  3 | wikiparque.py -m    | mapa con todos los parques de la Comunidad de Madrid                                                    |
