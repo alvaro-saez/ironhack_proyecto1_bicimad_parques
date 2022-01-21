@@ -93,10 +93,34 @@ The API code would be the next one:
    json_parques_df = pd.json_normalize(json_parques)
    
 The final csv is:
-<p align="left"><img src="https://github.com/alvaro-saez/ih_datamadpt1121_project_m1/blob/main/datasets/code_img/ac1.png"></p>
 
+# location = "../datasets/parques_municipales.csv"
+def import_parques_municipales(location_parque):
+    parques_municipales_df = pd.read_csv(location_parque, sep=';')
+    return parques_municipales_df
 
+    
 
+b) Import dataset of bicimad API:
+def bicimad_api(email,psw):
+    auth_url = "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/"
+    json_bicimad =  requests.get(auth_url, headers={"email":email,"password":psw})
+    json_bicimad_token= json_bicimad.json()['data'][0]['accessToken']
+    bicimad_list_url = "https://openapi.emtmadrid.es/v1/transport/bicimad/stations/"
+    json_bicimad_list = requests.get(bicimad_list_url, headers = {"accessToken":json_bicimad_token}).json()
+    json_bicimad_df = pd.json_normalize(json_bicimad_list)["data"][0]
+    
+    def geometry_coordinates_bm(geometry):
+        geometry_coordinates = geometry["coordinates"]
+        return geometry_coordinates
+    
+    bicimad_st_df = pd.DataFrame(json_bicimad_df)
+    bicimad_st_df["geometry_type"] = "Point"
+    bicimad_st_df["geometry_coordinates"] = bicimad_st_df["geometry"].apply(geometry_coordinates_bm)
+    
+    bicimad_st_df = bicimad_st_df.drop(["geometry"], axis=1)
+    
+    return bicimad_st_df
 
 
 
