@@ -95,11 +95,11 @@ The API code would be the next one:
 The final csv is:
 
 # location = "../datasets/parques_municipales.csv"
+
 def import_parques_municipales(location_parque):
     parques_municipales_df = pd.read_csv(location_parque, sep=';')
     return parques_municipales_df
 
-    
 
 b) Import dataset of bicimad API:
 def bicimad_api(email,psw):
