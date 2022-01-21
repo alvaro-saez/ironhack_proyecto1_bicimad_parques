@@ -62,6 +62,11 @@ The best practice is to use the BiciMAD API service beacuse it has information w
 
 ## **MODULES:**
 
+The libraries imported are:
+
+<p align="left"><img src="https://github.com/alvaro-saez/ih_datamadpt1121_project_m1/blob/main/datasets/code_img/libraries.png"></p>
+
+
 This Python App (**Data Pipeline**) has 2 main scripts:
 
 - ADMIN SCRIPT called "main_script_dataset.py": It executes the needed code to create the final datasets used bu the user script. It use 3 modules:
@@ -564,3 +569,4 @@ if __name__ == '__main__':
         engine.say(disfruta_del_parque_voice);
         engine.runAndWait();
 
+THANK YOU VERY MUCH
