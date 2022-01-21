@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# ## MAIN USER INTERACTION SCRIPT CALLED "WIKIPARQUE.PY"
+# 
+# THIS IS THE MAIN USER SCRIPT WHICH PRETENDS TO ESTABLISH A CONVERSATION WITH THE USER TO GIVE USEFUL INFORMATION ABOUT THE PARKS OF MADRID
+
 # In[42]:
 
 
@@ -40,12 +44,17 @@ from p_reporting import p_reporting as rp
 pd.set_option('display.max_rows', 500)
 
 
+# WE USE THE FUNCTIONS OF THE REPORTING MODULE TO OBTAIN INFROMATION TO EXECUTE IN THIS SCRIPT.
+# 
+# WE ALSO USE ARGPARSE TO GIVE THE USER DIFFERENT COMMANDS TO USE IN THE TERMINAL.
+
 # In[43]:
 
 
 def argument_parser():
     parser = argparse.ArgumentParser(description='comandos para obtener información de tus parques favoritos',add_help=False)
     
+    #THE PARSER ARGUMENT WHICH THE USER HAS
     parser.add_argument("-help", "--help_app_used", help="restaurantes cerca de tu parque favorito", action='store_true')
     parser.add_argument("-l", "--listado", help="listado con todos los nombres de los parques de la Comunidad de Madrid", action='store_true')
     parser.add_argument("-lpb", "--listado_parques_bicis", help="listado con todos los parques de la Comunidad de Madrid y su respectiva estación de BiciMad más cercana", action='store_true')
@@ -60,8 +69,9 @@ def argument_parser():
     parser.add_argument("-pt", "--place_transport", help="transporte público cercano al parque", action='store_true')
     parser.add_argument("-e", "--email", help="escribe 'wikiparque.py -e' para recibir el listado completo de parques y estaciones de BiciMAD en tu email", action='store_true')
     parser.add_argument("-gm", "--google_maps", help="rutas en Google Maps desde tu ubicación hasta tu parque favorito", action='store_true')
-    parser.add_argument("-gi", "--google_maps_img", help="imágenes del parqueen Google Maps desde tu ubicación hasta tu parque favorito", action='store_true')
+    parser.add_argument("-gi", "--google_maps_img", help="imágenes del parque", action='store_true')
     parser.add_argument("-gr", "--place_restaurantes", help="restaurantes cerca de tu parque favorito", action='store_true')
+    parser.add_argument("-tr", "--troll", help="videos random que se irán actualizando de celebridades usando los parques de la Comunidad de Madrid", action='store_true')
 
     args = parser.parse_args()
     return args
@@ -69,13 +79,15 @@ def argument_parser():
 
 def main(arguments):
     
+    #LOCATION OF THE FILES NEEDED TO USE IN THIS SCRIPT
     location_min_dataset = "datasets/final_df_min_distance_optimizated.csv"
     interaction_min_dataset = rp.import_min_dataset(location_min_dataset)
     filename = "datasets/final_df_min_distance_optimizated.csv"
     location_speak = "datasets/input_speak.mp3" #deprecated (old voice command location)
     engine = pyttsx3.init(); #for voice command
     
-    argparse_comand_list = ["wikiparque.py -help", "wikiparque.py -l", "wikiparque.py -lpb",  "wikiparque.py -m",  "wikiparque.py -bs",  "wikiparque.py -bm",  "wikiparque.py -ba",  "wikiparque.py -bb",  "wikiparque.py -bd",  "wikiparque.py -pd",  "wikiparque.py -pb",  "wikiparque.py -pt",  "wikiparque.py -e",  "wikiparque.py -gm",  "wikiparque.py -gi",  "wikiparque.py -gr"]
+    #A NEW DATAFRAME TO SHOW TO THE USER ALL THE COMMANDS IN A PRETTIER TABLE
+    argparse_comand_list = ["wikiparque.py -help", "wikiparque.py -l", "wikiparque.py -lpb",  "wikiparque.py -m",  "wikiparque.py -bs",  "wikiparque.py -bm",  "wikiparque.py -ba",  "wikiparque.py -bb",  "wikiparque.py -bd",  "wikiparque.py -pd",  "wikiparque.py -pb",  "wikiparque.py -pt",  "wikiparque.py -e",  "wikiparque.py -gm",  "wikiparque.py -gi",  "wikiparque.py -gr", "wikiparque.py -tr"]
     argparse_comand_list_help = ["comandos de ayuda para utilizar la app",
                                  "listado con todos los nombres de los parques de la Comunidad de Madrid",
                                  "listado con todos los parques de la Comunidad de Madrid y su respectiva estación de BiciMad más cercana",
@@ -90,24 +102,28 @@ def main(arguments):
                                  "transporte público cercano al parque",
                                  "para recibir el listado completo de parques y estaciones de BiciMAD en tu email",
                                  "rutas en Google Maps desde tu ubicación hasta tu parque favorito",
-                                 "imágenes del parqueen Google Maps desde tu ubicación hasta tu parque favorito",
-                                 "restaurantes cerca de tu parque favorito"]
+                                 "imágenes del parque",
+                                 "restaurantes cerca de tu parque favorito",
+                                 "videos random que se irán actualizando de celebridades usando los parques de la Comunidad de Madrid"]
     argparse_comand_list_df = pd.DataFrame({"command lists":argparse_comand_list,
                               "commands description":argparse_comand_list_help})
     
+    #FUNCTION OF FUZZYWUZY TO INCREASE THE APP LEGIBILITY
     def fw_ratio(x):
         fw1 = x
         fw2 = input_parque_user
         ratio = fuzz.ratio(input_parque_user.lower().strip(), x.lower().strip())
         return ratio
     
-    if not arguments.listado and  not arguments.help_app_used and  not arguments.listado_parques_bicis and  not arguments.maps_parques and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes:
+    #INITIAL STATEMENT TO PRESENT TO THE USER THE APP
+    if not arguments.listado and  not arguments.help_app_used and  not arguments.listado_parques_bicis and  not arguments.maps_parques and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes and  not arguments.troll:
         intro = "Hola, esta es una app informativa sobre los Parques Municipales de la excelentísima Comunidad de Madrid, presidida por nuestra dueña y señora AYUSO.\n Escribe: 'python wikiparque.py -help' para saber todo lo que podemos ofrecerte"
         print(intro)
         #rp.speak_wikiparque(intro, location_speak)
         engine.say(intro);
         engine.runAndWait();
-        
+    
+    #EXECUTION OF ALL THE COMMANDS
     elif arguments.help_app_used:
         print(tabulate(
             argparse_comand_list_df,
@@ -475,8 +491,18 @@ def main(arguments):
             error_wrong_park = "Parque mal escrito... busca en Google cachondo"
             print(error_wrong_park)
             engine.say(error_wrong_park);
-            engine.runAndWait();            
+            engine.runAndWait();
             
+    elif arguments.troll:
+        troll_video = "file:///C:/Users/AlvaroSaez/Desktop/ironhack/ih_datamadpt1121_project_m1/datasets/almeida_parques_fin.mp4"
+        webbrowser.open(troll_video)
+        print("\n")
+        listado_text = "gracias por usar wikiparque, esperamos volver a verte pronto"
+        print(listado_text)
+        engine.say(listado_text);
+        engine.runAndWait();
+
+    #MESSAGE IN CASE THE USER WRITES A WRONG COMMAND
     else:
         error_wrong_command = "Comando mal escrito, escribe 'python wikiparque.py -help' para volver a ver el conjunto de comandos"     
         print(error_wrong_command)
@@ -486,6 +512,7 @@ def main(arguments):
 # Pipeline execution
 
 if __name__ == '__main__':
+    #TO HANDLING ERRORS WE USE TRY, EXCEPT AND ELSE, MINIMIZING CODE AND INCREASING THE USER EXPERIENCE
     try:
         main(argument_parser())
     except:

@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# ## REPORTING SCRIPT
+# 
+# IN THIS SCRIPT WE DEFINE ALL THE FUNCTIONS WHICH WILL BE USED IN THE USER INTERACTION SCRIPT CALLED "WIKIPARQUE.PY"
+
 # In[54]:
 
 
@@ -11,7 +15,7 @@ import numpy as np
 import requests
 
 import warnings
-#warnings.filterwarnings('ignore');
+warnings.filterwarnings('ignore');
 pd.set_option('display.max_rows', 500)
 
 import email, smtplib, ssl
@@ -26,9 +30,9 @@ import osmnx as ox
 import folium
 
 
-# #### importar datasets finales
+# #### IMPORT THE FINAL DATAFRAME CREATED WITH THE ADMIN SCRIPT
 
-# In[58]:
+# In[63]:
 
 
 #location_min_dataset = "../datasets/final_df_min_distance_optimizated.csv"
@@ -37,15 +41,19 @@ def import_min_dataset(location_min_dataset):
     return interaction_min_dataset
 
 
-# In[59]:
+# In[1]:
 
 
 #interaction_min_dataset = import_min_dataset(location_min_dataset)
 #interaction_min_dataset
 
 
+# #### THE NEXT FUNCTIONS GIVES US A DESIRED VALUE BY THE COSTUMER WHEN HE/SHE WRITES HIS/HER FAVOURITE PARK
+
 # In[4]:
 
+
+#CLOSEST BICIMAD STATION
 
 def bicimad_station(input_parque,interaction_min_dataset):
     bicimad_station = "la estación de bicis más cercana es: " +str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "BiciMAD station"].tolist()[0])
@@ -55,6 +63,8 @@ def bicimad_station(input_parque,interaction_min_dataset):
 # In[5]:
 
 
+#ADRESS OF THE CLOSEST BICIMAD STATION
+
 def bicimad_adress(input_parque,interaction_min_dataset):
     bicimad_adress = "su dirección es: " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Station location"].tolist()[0])
     return bicimad_adress
@@ -62,6 +72,8 @@ def bicimad_adress(input_parque,interaction_min_dataset):
 
 # In[6]:
 
+
+#NUMBER OF BIKES OF THE CLOSEST BICIMAD STATION
 
 def bicimad_bikes(input_parque,interaction_min_dataset):
     bicimad_bikes = "hay " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Station Bikes Availability"].tolist()[0]) + " bicis disponibles"
@@ -71,6 +83,8 @@ def bicimad_bikes(input_parque,interaction_min_dataset):
 # In[7]:
 
 
+#AVAILABILITY OF THE BASE OF THE CLOSEST BICIMAD STATION
+
 def bicimad_dejar_bici(input_parque,interaction_min_dataset):
     bicimad_dejar_bici =str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Station base availability"].tolist()[0]) + " base para dejar la bici"
     return bicimad_dejar_bici
@@ -78,6 +92,8 @@ def bicimad_dejar_bici(input_parque,interaction_min_dataset):
 
 # In[8]:
 
+
+#DESCRIPTION OF THE PARK CHOSEN BY THE USER
 
 def place_description(input_parque,interaction_min_dataset):
     place_description = str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Place description"].tolist()[0])
@@ -87,6 +103,8 @@ def place_description(input_parque,interaction_min_dataset):
 # In[9]:
 
 
+#NEIGHBORHOOD OF THE PARK CHOSEN BY THE USER
+
 def place_barrio(input_parque,interaction_min_dataset):
     place_barrio = "su barrio es: " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Place neighborhood"].tolist()[0])
     return place_barrio
@@ -94,6 +112,8 @@ def place_barrio(input_parque,interaction_min_dataset):
 
 # In[10]:
 
+
+#NPUBLIC TRANSTPORT AVAILABLE OF THE PARK CHOSEN BY THE USER
 
 def place_transport(input_parque,interaction_min_dataset):
     place_transport = "contiene los siguientes transportes: " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Place transport"].tolist()[0])
@@ -107,6 +127,8 @@ def place_transport(input_parque,interaction_min_dataset):
 # In[11]:
 
 
+#DISTANCE IN METERS OF THE CLOSEST BICIMAD STATION
+
 def bicimad_station_meters(input_parque,interaction_min_dataset):
     bicimad_station = "la estación de bicis más cercana esta a : " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Distance Between BiciMAD station and Place of interest"].tolist()[0]) + " metros"
     return bicimad_station
@@ -114,6 +136,8 @@ def bicimad_station_meters(input_parque,interaction_min_dataset):
 
 # In[17]:
 
+
+#FUNCTION TO SEND AN EMAIL TO THE USER WITH THE HOLE DATAFRAME INFORMATION
 
 def wikiparque_email_sender(receiver_email,filename):
 
@@ -165,12 +189,17 @@ def wikiparque_email_sender(receiver_email,filename):
 # In[41]:
 
 
+#FUNCTION TO OBTAIN AN URL OF GOOGLE MAPS WITH THE POSIBILITIES OF TRANSPORT BETWEEN THE PARK CHOSEN AND THE CURRENT LOCATION OF THE USER
+
 def open_wikipedia(input_parque,interaction_min_dataset):
     final_open_maps_url = str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "g_maps"].tolist()[0])
     return final_open_maps_url
 
 
 # In[ ]:
+
+
+#FUNCTION TO OBTAIN AN URL OF GOOGLE MAPS WITH THE CLOSESTS RESTAURANTS OF THE PARK CHOSEN BY THE USER
 
 
 def restaurantes_google_maps(input_parque,interaction_min_dataset):
@@ -181,10 +210,16 @@ def restaurantes_google_maps(input_parque,interaction_min_dataset):
 # In[60]:
 
 
-#en desuso
+#DEPRECATED FUNCTION TO ADD VOICE INTO THE TERMINAL
 def speak_wikiparque(text_speak, location_speak):
     input_speak = gtts.gTTS(text_speak, lang="es")
     input_speak.save(location_speak)
     speak = playsound(location_speak)
     return speak
+
+
+# In[2]:
+
+
+#interaction_min_dataset["CONTENT-URL"]
 
