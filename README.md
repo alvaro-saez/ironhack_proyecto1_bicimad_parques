@@ -9,6 +9,7 @@ The current proyect consist on simulate the experience of an app through python 
 It has 16 terminal commands to interact with the app asking for useful information:
 
 0 - wikiparque.py -help  -->  comandos de ayuda para utilizar la app                                                                  |
+
 1 - wikiparque.py
 
 ## **Data:**
