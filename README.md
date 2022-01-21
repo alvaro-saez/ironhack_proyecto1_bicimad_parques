@@ -6,10 +6,7 @@ Ironhack Madrid - Data Analytics Part Time - November 2021 - Project Module 1
 
 The current proyect consist on simulate the experience of an app through python code via Terminal UI. This "app" is about information around the Parks of Madrid.
 
-It has 16 terminal commands to interact with the app asking for useful information:
-
-   | command lists       | commands description                                                                                    |
-   
+It has 16 terminal commands to interact with the app asking for useful information:   
    
 |  0 | wikiparque.py -help | comandos de ayuda para utilizar la app                                                                  |
 
@@ -49,22 +46,21 @@ It has 16 terminal commands to interact with the app asking for useful informati
 
 There are 2 main datasources:
 
-- **Azure SQL Database.** The database contains information from the BiciMAD stations including their location (i.e.: latitude / longitude). In order to access the database you may need the following credentials:
-```
-Server name:   sqlironhack
-Database:      BiciMAD
-```
-> __IMPORTANT =>__ Username and password will be provided in class.
+- **MADRID CITY HALL API OR CSV** 
+
+The best practice would be to use the API of the city council of Madrid but I have used the CSV because it has more information and my main objective is to create a complete app about the parks of Madrid. This information is not updated everyday, so it is feasible to download the csv once per month
 
 
-- **API REST.** We will use the API REST from the [Portal de datos abiertos del Ayuntamiento de Madrid](https://datos.madrid.es/nuevoMadrid/swagger-ui-master-2.2.10/dist/index.html?url=/egobfiles/api.datos.madrid.es.json#/), where you can find the __Catálogo de datos__ with more than 70 datasets.
+- **API REST OF BICIMAD.** 
 
-> __IMPORTANT =>__ Specific datasets will be assigned to each student in order to perform the challenges.
+The best practice is to use the BiciMAD API service beacuse it has information which changes every day and it is not feasible to dowload every day.
+
+(DOCUMENTATION API: https://apidocs.emtmadrid.es/#api-Block_4_TRANSPORT_BICIMAD-List_of_Bicimad_Stations)
 
 
 ---
 
-## **Main Challenge:**
+## **MODULES:**
 
 You must create a Python App (**Data Pipeline**) that allow their potential users to find the nearest BiciMAD station to a set of places of interest. The output table should look similar to:
 
