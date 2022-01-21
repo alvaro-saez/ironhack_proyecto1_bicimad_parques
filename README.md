@@ -83,353 +83,484 @@ The interaction is expressed using inputs method and ARPARSE, which allows to us
 
 ## **CODE**
 
-- ACQUISITION SCRIPT:
-a) Import dataset of "parques municipales": 
+You can see all the code in the differents modules. It is explained with comments. T
 
-The API code would be the next one:
+The next code belongs to the main user script (wikiparque.py") which establishes the interaction with the user
 
-   json_parques =  requests.get("https://datos.madrid.es/egob/catalogo/200761-0-parques-jardines.json").json()["@graph"]
-
-   json_parques_df = pd.json_normalize(json_parques)
-   
-The final csv is:
-
-# location = "../datasets/parques_municipales.csv"
-
-def import_parques_municipales(location_parque):
-    parques_municipales_df = pd.read_csv(location_parque, sep=';')
-    return parques_municipales_df
-
-
-b) Import dataset of bicimad API:
-def bicimad_api(email,psw):
-    auth_url = "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/"
-    json_bicimad =  requests.get(auth_url, headers={"email":email,"password":psw})
-    json_bicimad_token= json_bicimad.json()['data'][0]['accessToken']
-    bicimad_list_url = "https://openapi.emtmadrid.es/v1/transport/bicimad/stations/"
-    json_bicimad_list = requests.get(bicimad_list_url, headers = {"accessToken":json_bicimad_token}).json()
-    json_bicimad_df = pd.json_normalize(json_bicimad_list)["data"][0]
+def argument_parser():
+    parser = argparse.ArgumentParser(description='comandos para obtener información de tus parques favoritos',add_help=False)
     
-    def geometry_coordinates_bm(geometry):
-        geometry_coordinates = geometry["coordinates"]
-        return geometry_coordinates
-    
-    bicimad_st_df = pd.DataFrame(json_bicimad_df)
-    bicimad_st_df["geometry_type"] = "Point"
-    bicimad_st_df["geometry_coordinates"] = bicimad_st_df["geometry"].apply(geometry_coordinates_bm)
-    
-    bicimad_st_df = bicimad_st_df.drop(["geometry"], axis=1)
-    
-    return bicimad_st_df
+    #THE PARSER ARGUMENT WHICH THE USER HAS
+    parser.add_argument("-help", "--help_app_used", help="restaurantes cerca de tu parque favorito", action='store_true')
+    parser.add_argument("-l", "--listado", help="listado con todos los nombres de los parques de la Comunidad de Madrid", action='store_true')
+    parser.add_argument("-lpb", "--listado_parques_bicis", help="listado con todos los parques de la Comunidad de Madrid y su respectiva estación de BiciMad más cercana", action='store_true')
+    parser.add_argument("-m", "--maps_parques", help="mapa con todos los parques de la Comunidad de Madrid", action='store_true')
+    parser.add_argument("-bs", "--bicimad_station", help="nombre de la estación de BiciMAD más cercana", action='store_true')
+    parser.add_argument("-bm", "--bicimad_station_meters", help="distancia a la estación de BiciMAD más cercana", action='store_true')
+    parser.add_argument("-ba", "--bicimad_adress", help="dirección de la estación de BiciMAD más cercana", action='store_true')
+    parser.add_argument("-bb", "--bicimad_bikes", help="número de bicis disponibles en la estación de BiciMAD más cercana", action='store_true')
+    parser.add_argument("-bd", "--bicimad_dejar_bici", help="base disponible para dejar la bici en la estación de BiciMAD más cercana", action='store_true')
+    parser.add_argument("-pd", "--place_description", help="descripción del parque", action='store_true')
+    parser.add_argument("-pb", "--place_barrio", help="barrio en el que se encuentra el parque", action='store_true')
+    parser.add_argument("-pt", "--place_transport", help="transporte público cercano al parque", action='store_true')
+    parser.add_argument("-e", "--email", help="escribe 'wikiparque.py -e' para recibir el listado completo de parques y estaciones de BiciMAD en tu email", action='store_true')
+    parser.add_argument("-gm", "--google_maps", help="rutas en Google Maps desde tu ubicación hasta tu parque favorito", action='store_true')
+    parser.add_argument("-gi", "--google_maps_img", help="imágenes del parque", action='store_true')
+    parser.add_argument("-gr", "--place_restaurantes", help="restaurantes cerca de tu parque favorito", action='store_true')
+    parser.add_argument("-tr", "--troll", help="videos random que se irán actualizando de celebridades usando los parques de la Comunidad de Madrid", action='store_true')
 
-- WRANGLING SCRIPT:
+    args = parser.parse_args()
+    return args
 
-def datasets_transformados(parques_municipales_df,bicimad_st_df):
-    #PARQUES MUNICIAPLES DATAFRAME --> we add a static value to use in the main user script
-    parques_municipales_df["Type of Place"] = "Principales parques y jardines municipales"
-    
-    #BICIMAD DATAFRAME --> we extract the Longitude and Latitude
-    def bicimad_geo_long(geo):
-        geo_clean = str(geo).replace("[","").replace("]","").split(",")
-        longitud = geo_clean[0].strip()
-        return longitud
-    bicimad_st_df["LONGITUD"] = bicimad_st_df["geometry_coordinates"].apply(bicimad_geo_long)
-    
-    def bicimad_geo_lat(geo):
-        geo_clean = str(geo).replace("[","").replace("]","").split(",")
-        latitud = geo_clean[1].strip()
-        return latitud
-    bicimad_st_df["LATITUD"] = bicimad_st_df["geometry_coordinates"].apply(bicimad_geo_lat)
 
-    return "transformed datasets with success"
-
-- ANALYSIS SCRIPT:
-
-1. PREPARE THE FINAL DATAFRAME
-
-a) place dataframe:
-
-def preparar_tabla_place(parques_municipales_df):
+def main(arguments):
     
-    #NAME OF COLUMNS
-    final_df_colnames_place = ["Place of interest","Type of place","Place address","Place distrit","Place neighborhood","Place description","Place transport","Place latitude","Place longitude"]
-    final_df_place = parques_municipales_df[["NOMBRE","Type of Place","NOMBRE-VIA","DISTRITO", "BARRIO", "DESCRIPCION-ENTIDAD", "TRANSPORTE","LATITUD","LONGITUD"]]
-    final_df_place.columns = final_df_colnames_place
+    #LOCATION OF THE FILES NEEDED TO USE IN THIS SCRIPT
+    location_min_dataset = "datasets/final_df_min_distance_optimizated.csv"
+    interaction_min_dataset = rp.import_min_dataset(location_min_dataset)
+    filename = "datasets/final_df_min_distance_optimizated.csv"
+    location_speak = "datasets/input_speak.mp3" #deprecated (old voice command location)
+    engine = pyttsx3.init(); #for voice command
     
-    #MERCATOR FUNCITON OF GEOPANDAS
-    def to_mercator2(lat, long):
-    # transform latitude/longitude data in degrees to pseudo-mercator coordinates in metres
-        c = gpd.GeoSeries([Point(lat, long)], crs=4326)
-        c = c.to_crs(3857)
-        return c
+    #A NEW DATAFRAME TO SHOW TO THE USER ALL THE COMMANDS IN A PRETTIER TABLE
+    argparse_comand_list = ["wikiparque.py -help", "wikiparque.py -l", "wikiparque.py -lpb",  "wikiparque.py -m",  "wikiparque.py -bs",  "wikiparque.py -bm",  "wikiparque.py -ba",  "wikiparque.py -bb",  "wikiparque.py -bd",  "wikiparque.py -pd",  "wikiparque.py -pb",  "wikiparque.py -pt",  "wikiparque.py -e",  "wikiparque.py -gm",  "wikiparque.py -gi",  "wikiparque.py -gr", "wikiparque.py -tr"]
+    argparse_comand_list_help = ["comandos de ayuda para utilizar la app",
+                                 "listado con todos los nombres de los parques de la Comunidad de Madrid",
+                                 "listado con todos los parques de la Comunidad de Madrid y su respectiva estación de BiciMad más cercana",
+                                 "mapa con todos los parques de la Comunidad de Madrid",
+                                 "nombre de la estación de BiciMAD más cercana",
+                                 "distancia a la estación de BiciMAD más cercana",
+                                 "dirección de la estación de BiciMAD más cercana",
+                                 "número de bicis disponibles en la estación de BiciMAD más cercana",
+                                 "base disponible para dejar la bici en la estación de BiciMAD más cercana",
+                                 "descripción del parque",
+                                 "barrio en el que se encuentra el parque",
+                                 "transporte público cercano al parque",
+                                 "para recibir el listado completo de parques y estaciones de BiciMAD en tu email",
+                                 "rutas en Google Maps desde tu ubicación hasta tu parque favorito",
+                                 "imágenes del parque",
+                                 "restaurantes cerca de tu parque favorito",
+                                 "videos random que se irán actualizando de celebridades usando los parques de la Comunidad de Madrid"]
+    argparse_comand_list_df = pd.DataFrame({"command lists":argparse_comand_list,
+                              "commands description":argparse_comand_list_help})
     
-    final_df_place["mercator place"] = final_df_place.apply(lambda final_df_place: to_mercator2(final_df_place["Place latitude"], final_df_place["Place longitude"]), axis=1)
+    #FUNCTION OF FUZZYWUZY TO INCREASE THE APP LEGIBILITY
+    def fw_ratio(x):
+        fw1 = x
+        fw2 = input_parque_user
+        ratio = fuzz.ratio(input_parque_user.lower().strip(), x.lower().strip())
+        return ratio
     
-    return final_df_place
+    #INITIAL STATEMENT TO PRESENT TO THE USER THE APP
+    if not arguments.listado and  not arguments.help_app_used and  not arguments.listado_parques_bicis and  not arguments.maps_parques and  not arguments.bicimad_station and  not arguments.bicimad_adress and  not arguments.bicimad_bikes and  not arguments.bicimad_dejar_bici and  not arguments.place_description and  not arguments.place_barrio and  not arguments.place_transport and  not arguments.place_transport and  not arguments.email and not arguments.bicimad_station_meters and not arguments.google_maps and not arguments.google_maps_img and not arguments.place_restaurantes and  not arguments.troll:
+        intro = "Hola, esta es una app informativa sobre los Parques Municipales de la excelentísima Comunidad de Madrid, presidida por nuestra dueña y señora AYUSO.\n Escribe: 'python wikiparque.py -help' para saber todo lo que podemos ofrecerte"
+        print(intro)
+        #rp.speak_wikiparque(intro, location_speak)
+        engine.say(intro);
+        engine.runAndWait();
     
-b) bicimad dataframe:
+    #EXECUTION OF ALL THE COMMANDS
+    elif arguments.help_app_used:
+        print(tabulate(
+            argparse_comand_list_df,
+            headers=argparse_comand_list_df.columns,
+            floatfmt=".5f",
+            showindex=True,
+            tablefmt="psql",
+            )
+        )
+        #print(interaction_min_dataset["Place of interest"])
+        print("\n")
+        listado_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -help'"
+        print(listado_text)
+        engine.say(listado_text);
+        engine.runAndWait();
 
-def preparar_tabla_bicimad(bicimad_st_df):
-
-    #NAME OF COLUMNS    
-    final_df_colnames_bici = ["BiciMAD station","Station location","Station latitude","Station longitude","Station base availability","Station Bikes Availability"]
-    final_df_bici = bicimad_st_df[["name","address","LATITUD","LONGITUD", "no_available", "dock_bikes"]]
-    final_df_bici.columns = final_df_colnames_bici
-    
-    #AVAILABILITY TEXT TRANSFORMATION
-    def change_availability(data):
-        if data == 0:
-            return "disponible"
-        elif data == 1:
-            return "no disponible"
+    elif arguments.listado:
+        print(tabulate(
+            pd.DataFrame(interaction_min_dataset["Place of interest"]),
+            headers=pd.DataFrame(interaction_min_dataset["Place of interest"]).columns,
+            floatfmt=".5f",
+            showindex=True,
+            tablefmt="psql",
+            )
+        )
+        #print(interaction_min_dataset["Place of interest"])
+        print("\n")
+        listado_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -help'"
+        print(listado_text)
+        engine.say(listado_text);
+        engine.runAndWait();
+        
+    elif arguments.listado_parques_bicis:
+        print(tabulate(
+            pd.DataFrame(interaction_min_dataset[["Place of interest","BiciMAD station"]]),
+            headers=pd.DataFrame(interaction_min_dataset[["Place of interest","BiciMAD station"]]).columns,
+            floatfmt=".5f",
+            showindex=True,
+            tablefmt="psql",
+            )
+        )
+        #print(interaction_min_dataset[["Place of interest","BiciMAD station"]])
+        print("\n")
+        listado_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -help'"
+        print(listado_text)
+        engine.say(listado_text);
+        engine.runAndWait();
+        
+    elif arguments.maps_parques:
+        #rp.open_street_maps(interaction_min_dataset)
+        webbrowser.open("file:///C:/Users/AlvaroSaez/Desktop/ironhack/ih_datamadpt1121_project_m1/datasets/open_street_df.html")
+        print("\n")
+        maps_parques_text = "Si quieres más información escribe uno de los comandos que te mostramos en 'python wikiparque.py -help'"
+        print(maps_parques_text)
+        engine.say(maps_parques_text);
+        engine.runAndWait();
+        
+    elif arguments.bicimad_station:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        bicimad_station2 = rp.bicimad_station(input_parque,interaction_min_dataset)
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            print(bicimad_station2)
+            engine.say(bicimad_station2);
+            engine.runAndWait();
         else:
-            return data
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
+            
+    elif arguments.bicimad_adress:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
         
-    final_df_bici["Station base availability"] = final_df_bici["Station base availability"].apply(change_availability)
-    
-    #MERCATOR FUNCITON OF GEOPANDAS
-    def to_mercator2(lat, long):
-    # transform latitude/longitude data in degrees to pseudo-mercator coordinates in metres
-        c = gpd.GeoSeries([Point(lat, long)], crs=4326)
-        c = c.to_crs(3857)
-        return c
-    
-    final_df_bici["Station latitude"] = pd.to_numeric(final_df_bici["Station latitude"])
-    final_df_bici["Station longitude"] = pd.to_numeric(final_df_bici["Station longitude"])
-    final_df_bici["mercator station"] = final_df_bici.apply(lambda final_df_bici: to_mercator2(final_df_bici["Station latitude"], final_df_bici["Station longitude"]), axis=1)
-    
-    return final_df_bici
-    
-c) UNIFIED FINAL DATAFRAME WITH BOTH PREVIOUS TABLES ("parques" and "bicimad"):
-
-def preparar_tabla_final(final_df_place,final_df_bici):
-    
-    #MERGE OF BOTH TABLES
-    final_df = final_df_place.assign(key=1).merge(final_df_bici.assign(key=1), how='outer', on = 'key')
-    
-    #FINAL GEOPANDAS FUNCTION TO OBTAIN THE DISTANCE BETWEEN THE PARK AND THE BICIMAD STATION
-    def distance_meters(start,finish):
-        return start.distance(finish)
-    
-    #COLUMN ADDED
-    final_df["Distance Between BiciMAD station and Place of interest"] = final_df.apply(lambda final_df: distance_meters(final_df["mercator place"], final_df["mercator station"]), axis=1)
-    
-    #EXPORTATION OF THIS DATAFRAME IN A CSV
-    final_df_full_info_csv_optimizated = final_df.to_csv("datasets/final_df_full_info_optimizated.csv", sep=',',index=False)
-    
-    return final_df 
-
-2. PREPARE THE FINAL MINIMIZED DATAFRAME
-
-def preparar_tabla_final_minimizada(final_df):
-    
-    #OBTAINING THE MINIMUM DISTANCE USING GROUPBY() METHOD AND MIN() METHOD
-    total_distance_array_min = final_df.groupby(["Place of interest"])["Distance Between BiciMAD station and Place of interest"].min().tolist()
-    
-    #CREATING A NEW DATAFRAME WITH ONLY ONE DISTANCE PER PARK
-    list_min=[]
-    for i in total_distance_array_min:
-        linea_para_df = final_df.loc[final_df["Distance Between BiciMAD station and Place of interest"]==i]
-        linea_para_df_list = linea_para_df.values.tolist()[0]
-        list_min.append(linea_para_df_list)
-
-    final_df_colnames_total = ["Place of interest","Type of place","Place address","Place distrit","Place neighborhood","Place description","Place transport","Place latitude","Place longitude","mercator place","key","BiciMAD station","Station location","Station latitude","Station longitude","Station base availability","Station Bikes Availability","mercator station"]
-    final_df_min_distance = pd.DataFrame(list_min, columns=final_df_colnames_total+["Distance Between BiciMAD station and Place of interest"])
-    
-    #ENRICHING THE DATAFRAME WITH THE FINAL URL OF SOME INTEREST PLACES IN GOOGLE MAPS
-    def place_maps_func(data):
-        place_maps = "+".join(data.split(" "))
-        return place_maps
-    def g_maps_func(place_maps, bici_maps):
-        g_maps = "https://www.google.com/maps/dir/" + str(place_maps) + "/" + str(bici_maps)
-        return g_maps
-
-    final_df_min_distance["place_maps"] = final_df_min_distance["Place of interest"].apply(place_maps_func)
-    final_df_min_distance["bici_maps"] = final_df_min_distance["Station location"].apply(place_maps_func)
-    final_df_min_distance["g_maps"] = final_df_min_distance.apply(lambda final_df_min_distance: g_maps_func(final_df_min_distance["place_maps"], final_df_min_distance["bici_maps"]), axis=1)
-    
-    #EXPORTING THIS DATAFRAME IN A CSV
-    final_df_min_distance_csv_optimizated = final_df_min_distance.to_csv("datasets/final_df_min_distance_optimizated.csv", sep=',',index=False)
-    
-    return final_df_min_distance
-    
-EXTRA: open_street_maps: It is a function to obtain a map with all the parks of Madrid in a single HTML file
-
-def open_street_maps(final_df_min_distance):
-    m = folium.Map([40.433462, -3.678595], zoom_start=12)
-    locs = zip(final_df_min_distance["Place latitude"].tolist(), final_df_min_distance["Place longitude"].tolist())
-    for location in locs:
-        #print(location)
-        if "nan" not in str(location):
-            folium.CircleMarker(location=location).add_to(m)
-            m.save('datasets/open_street_df.html')
-    return m
-
---- MAIN ADMIN SCRIPT ---
-
-from p_acquisition import p_acquisition as ac
-from p_wrangling import p_wrangling as wr
-from p_analysis import p_analysis as an
-
-if __name__ == "__main__":
-
-    def main_dataset():
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
         
-    #credentials and file location needed to import the data
-        email = "alvarosaezsanchez@gmail.com"
-        psw = "Bicimad1%"
-        location_parque = "datasets/parques_municipales.csv"
-        #location_bici = "datasets/bicimad_statios_database.csv" --> deprecated location of a csv to create the bicimad dataframe
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
         
-    # A) ACQUISITON MODULE
-        #Dataframe of my Places of Interest
-        parques_municipales_df = ac.import_parques_municipales(location_parque)
-        #Dataframe with the BiciMAD information
-        bicimad_st_df= ac.bicimad_api(email,psw)
-
-    # B) WRANGLING MODULE
-        wr.datasets_transformados(parques_municipales_df,bicimad_st_df)
-
-    # C) ANALYSIS MODULE
-        final_df_place = an.preparar_tabla_place(parques_municipales_df)
-        final_df_bici = an.preparar_tabla_bicimad(bicimad_st_df)
-        final_df = an.preparar_tabla_final(final_df_place,final_df_bici)
-        final_df_min_distance = an.preparar_tabla_final_minimizada(final_df)
-        an.open_street_maps(final_df_min_distance)    
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        bicimad_adress2 = rp.bicimad_adress(input_parque,interaction_min_dataset)
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            print(bicimad_adress2)
+            engine.say(bicimad_adress2);
+            engine.runAndWait();
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
+            
+    elif arguments.bicimad_bikes:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
         
-        print("exportado con éxito")
-    
-#EJECUTION OF THE MAIN FUNCTION
-    main_dataset()
-    
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        bicimad_bikes2 = rp.bicimad_bikes(input_parque,interaction_min_dataset)
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            print(bicimad_bikes2)
+            engine.say(bicimad_bikes2);
+            engine.runAndWait();
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
+            
+    elif arguments.bicimad_dejar_bici:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        bicimad_dejar_bici2 = rp.bicimad_dejar_bici(input_parque,interaction_min_dataset)
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            print(bicimad_dejar_bici2)
+            engine.say(bicimad_dejar_bici2);
+            engine.runAndWait();
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
+            
+    elif arguments.place_description:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        place_description2 = rp.place_description(input_parque,interaction_min_dataset)
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            print(place_description2)
+            engine.say(place_description2);
+            engine.runAndWait();
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
+            
+    elif arguments.place_barrio:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        place_barrio2 = rp.place_barrio(input_parque,interaction_min_dataset)
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            print(place_barrio2)
+            engine.say(place_barrio2);
+            engine.runAndWait();
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
+            
+    elif arguments.place_transport:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        place_transport2 = rp.place_transport(input_parque,interaction_min_dataset)
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            print(place_transport2)
+            engine.say(place_transport2);
+            engine.runAndWait();
+            print("\n")
+            engine.say("Dinos tu ubicación y te mostraremos en Google Maps cuanto tardarías para cada uno de los trasportes públicos");
+            engine.runAndWait();
+            ubicación_place_transport_user = input("Dinos tu ubicación y te mostraremos en Google Maps cuanto tardarías para cada uno de los trasportes públicos: ").strip()
+            ubicación_place_transport_user_formated = "+".join(ubicación_place_transport_user.split(" "))
+            imput_parque_user_formated = "+".join(input_parque.split(" "))
+            url_formated_transport_open_g_maps = "https://www.google.com/maps/dir/" + ubicación_place_transport_user_formated  + "/" + imput_parque_user_formated 
+            webbrowser.open(url_formated_transport_open_g_maps)
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
 
+    elif arguments.bicimad_station_meters:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        bicimad_station_meters2 = rp.bicimad_station_meters(input_parque,interaction_min_dataset)
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            print(bicimad_station_meters2)
+            engine.say(bicimad_station_meters2);
+            engine.runAndWait();
+            engine.say("esta distancia es en linea recta. ¿Quieres saber la distancia exacta en Google Maps. Escribe 'si' o 'no'");
+            engine.runAndWait();
+            g_maps_question = input("esta distancia es en linea recta. ¿Quieres saber la distancia exacta en Google Maps. Escribe 'si' o 'no': ").strip()
+            if g_maps_question == "si" or g_maps_question == "SI" or g_maps_question == "Si" or g_maps_question == "sI":
+                url_q_maps_question = rp.open_wikipedia(input_parque,interaction_min_dataset)
+                webbrowser.open(url_q_maps_question)
+            #else:
+                #disfruta_del_parque_vocie = "disfruta del parque"
+                #print(disfruta_del_parque_vocie)
+                #engine.say(disfruta_del_parque_vocie);
+                #engine.runAndWait();
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
+            
+    elif arguments.email:
+        engine.say("escribe tu email");
+        engine.runAndWait();
+        receiver_email = input("escribe tu email: ").strip()
+        try:
+            rp.wikiparque_email_sender(receiver_email,filename)
+        except:
+            email_wrong_voice = "Email mal escrito, fallo en Matrix"
+            print(email_wrong_voice)
+            engine.say(email_wrong_voice);
+            engine.runAndWait();
+        else:
+            email_ok_voice = "email enviado con éxito"
+            print(email_ok_voice)
+            engine.say(email_ok_voice);
+            engine.runAndWait();
+        
+    elif arguments.google_maps:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            engine.say("¿Cuál es tu ubicación?");
+            engine.runAndWait();
+            ubicación_place_transport_user = input("¿Cuál es tu ubicación?: ").strip()
+            ubicación_place_transport_user_formated = "+".join(ubicación_place_transport_user.split(" "))
+            imput_parque_user_formated = "+".join(input_parque.split(" "))
+            url_formated_transport_open_g_maps = "https://www.google.com/maps/dir/" + ubicación_place_transport_user_formated  + "/" + imput_parque_user_formated 
+            webbrowser.open(url_formated_transport_open_g_maps)
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
 
-- REPORTING SCRIPT:
+    elif arguments.place_restaurantes:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            imput_parque_user_formated = "+".join(input_parque.split(" "))
+            url_formated_restaurants_g_maps = "https://www.google.com/maps/search/Restaurantes+cerca+de+" + imput_parque_user_formated  + "/"
+            webbrowser.open(url_formated_restaurants_g_maps)
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
 
-def import_min_dataset(location_min_dataset):
-    interaction_min_dataset = pd.read_csv(location_min_dataset, sep=',', index_col=False)
-    return interaction_min_dataset
-    
-    
-#CLOSEST BICIMAD STATION
+    elif arguments.google_maps_img:
+        engine.say("¿Cuál es tu parque favorito?");
+        engine.runAndWait();
+        
+        #imput_parque_user
+        input_parque_user = input("¿Cuál es tu parque favorito?: ").strip()
+        
+        #fuzzywuzzy max ratio place of interest
+        interaction_min_dataset["place_sim_ratio"] = interaction_min_dataset["Place of interest"].apply(fw_ratio)
+        place_sim_ratio_max = interaction_min_dataset["place_sim_ratio"].max()
+        input_parque = interaction_min_dataset.loc[(interaction_min_dataset[("place_sim_ratio")]==place_sim_ratio_max)]["Place of interest"].tolist()[0]
+        
+        engine.say("para" + input_parque);
+        engine.runAndWait();
+        if input_parque in interaction_min_dataset["Place of interest"].tolist():
+            imput_parque_user_formated = "+".join(input_parque.split(" "))
+            url_formated_img_g_maps = "https://www.google.com/search?q=" + imput_parque_user_formated  + "&source=lnms&tbm=isch"
+            webbrowser.open(url_formated_img_g_maps)
+        else:
+            error_wrong_park = "Parque mal escrito... busca en Google cachondo"
+            print(error_wrong_park)
+            engine.say(error_wrong_park);
+            engine.runAndWait();
+            
+    elif arguments.troll:
+        troll_video = "file:///C:/Users/AlvaroSaez/Desktop/ironhack/ih_datamadpt1121_project_m1/datasets/almeida_parques_fin.mp4"
+        webbrowser.open(troll_video)
+        print("\n")
+        listado_text = "gracias por usar wikiparque, esperamos volver a verte pronto"
+        print(listado_text)
+        engine.say(listado_text);
+        engine.runAndWait();
 
-def bicimad_station(input_parque,interaction_min_dataset):
-    bicimad_station = "la estación de bicis más cercana es: " +str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "BiciMAD station"].tolist()[0])
-    return bicimad_station    
-    
-#ADRESS OF THE CLOSEST BICIMAD STATION
+    #MESSAGE IN CASE THE USER WRITES A WRONG COMMAND
+    else:
+        error_wrong_command = "Comando mal escrito, escribe 'python wikiparque.py -help' para volver a ver el conjunto de comandos"     
+        print(error_wrong_command)
+        engine.say(error_wrong_command);
+        engine.runAndWait(); 
+        
+# Pipeline execution
 
-def bicimad_adress(input_parque,interaction_min_dataset):
-    bicimad_adress = "su dirección es: " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Station location"].tolist()[0])
-    return bicimad_adress    
-    
-#NUMBER OF BIKES OF THE CLOSEST BICIMAD STATION
+if __name__ == '__main__':
+    #TO HANDLING ERRORS WE USE TRY, EXCEPT AND ELSE, MINIMIZING CODE AND INCREASING THE USER EXPERIENCE
+    try:
+        main(argument_parser())
+    except:
+        error_command_locoo = "¡LOCO, Comando mal escrito! ¡ESTATE ATENTO!, Escribe 'python wikiparque.py -help' para volver a ver el conjunto de comandos"
+        print(error_command_locoo)
+        engine = pyttsx3.init(); #for voice command
+        engine.say(error_command_locoo);
+        engine.runAndWait();
+    else:
+        disfruta_del_parque_voice = "disfruta del parque"
+        print(disfruta_del_parque_voice)
+        engine = pyttsx3.init(); #for voice command
+        engine.say(disfruta_del_parque_voice);
+        engine.runAndWait();
 
-def bicimad_bikes(input_parque,interaction_min_dataset):
-    bicimad_bikes = "hay " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Station Bikes Availability"].tolist()[0]) + " bicis disponibles"
-    return bicimad_bikes    
-    
-#AVAILABILITY OF THE BASE OF THE CLOSEST BICIMAD STATION
-
-def bicimad_dejar_bici(input_parque,interaction_min_dataset):
-    bicimad_dejar_bici =str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Station base availability"].tolist()[0]) + " base para dejar la bici"
-    return bicimad_dejar_bici    
-    
-#DESCRIPTION OF THE PARK CHOSEN BY THE USER
-
-def place_description(input_parque,interaction_min_dataset):
-    place_description = str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Place description"].tolist()[0])
-    return place_description    
-    
-#NEIGHBORHOOD OF THE PARK CHOSEN BY THE USER
-
-def place_barrio(input_parque,interaction_min_dataset):
-    place_barrio = "su barrio es: " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Place neighborhood"].tolist()[0])
-    return place_barrio    
-
-#PUBLIC TRANSTPORT AVAILABLE OF THE PARK CHOSEN BY THE USER
-
-def place_transport(input_parque,interaction_min_dataset):
-    place_transport = "contiene los siguientes transportes: " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Place transport"].tolist()[0])
-    if str(place_transport) == "contiene los siguientes transportes: nan":
-        place_transport = "lo siento, no hay transporte público cercano, anda un poco que te vendrá bien"
-    elif "Servicio Bicimad" in str(place_transport):
-        place_transport = place_transport.split("Servicio Bicimad")[0]
-    return place_transport
-    
-#DISTANCE IN METERS OF THE CLOSEST BICIMAD STATION
-
-def bicimad_station_meters(input_parque,interaction_min_dataset):
-    bicimad_station = "la estación de bicis más cercana esta a : " + str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "Distance Between BiciMAD station and Place of interest"].tolist()[0]) + " metros"
-    return bicimad_station
-    
-#FUNCTION TO SEND AN EMAIL TO THE USER WITH THE HOLE DATAFRAME INFORMATION
-
-def wikiparque_email_sender(receiver_email,filename):
-
-    subject = "WikiParque"
-    body = "Te adjuntamos en formato CSV la informacion más relevante del conjunto de Paruqes de la Comunidad de Madrid"
-    sender_email = "alvarosaezsanchez@gmail.com"
-    receiver_email = receiver_email
-    password = "jswfzrfqxpxibfzi"
-    
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = sender_email
-    message["To"] = receiver_email
-    message["Subject"] = subject
-    message["Bcc"] = receiver_email  # Recommended for mass emails
-    
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    
-    filename = filename
-    
-    # Open PDF file in binary mode
-    with open(filename, "rb") as attachment:
-        # Add file as application/octet-stream
-        # Email client can usually download this automatically as attachment
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload(attachment.read())
-    
-    # Encode file in ASCII characters to send by email    
-    encoders.encode_base64(part)
-    
-    # Add header as key/value pair to attachment part
-    part.add_header(
-        "Content-Disposition",
-        f"attachment; filename= {filename}",
-    )     
-    
-    # Add attachment to message and convert message to string
-    message.attach(part)
-    text = message.as_string()
-
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, text)    
-    
-#FUNCTION TO OBTAIN AN URL OF GOOGLE MAPS WITH THE POSIBILITIES OF TRANSPORT BETWEEN THE PARK CHOSEN AND THE CURRENT LOCATION OF THE USER
-
-def open_wikipedia(input_parque,interaction_min_dataset):
-    final_open_maps_url = str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "g_maps"].tolist()[0])
-    return final_open_maps_url    
-    
-#FUNCTION TO OBTAIN AN URL OF GOOGLE MAPS WITH THE CLOSESTS RESTAURANTS OF THE PARK CHOSEN BY THE USER
-
-
-def restaurantes_google_maps(input_parque,interaction_min_dataset):
-    final_restaurantes_url = str(interaction_min_dataset.loc[(interaction_min_dataset[("Place of interest")]==input_parque), "g_maps"].tolist()[0])
-    return final_open_maps_url    
-    
-#DEPRECATED FUNCTION TO ADD VOICE INTO THE TERMINAL
-def speak_wikiparque(text_speak, location_speak):
-    input_speak = gtts.gTTS(text_speak, lang="es")
-    input_speak.save(location_speak)
-    speak = playsound(location_speak)
-    return speak    
-    
-    
-    
