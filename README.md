@@ -1,6 +1,8 @@
-<p align="left"><img src="https://cdn-images-1.medium.com/max/184/1*2GDcaeYIx_bQAZLxWM4PsQ@2x.png"></p>
+<p align="left"><img src="https://thumbs.gfycat.com/ExemplaryFairFeline-max-1mb.gif"></p>
 
-# __ih_datamadpt1121_project_m1__
+
+
+# __ih_datamadpt1121_project_m1__ ALVARO SAEZ
 
 Ironhack Madrid - Data Analytics Part Time - November 2021 - Project Module 1
 
@@ -569,8 +571,5 @@ if __name__ == '__main__':
         engine.runAndWait();
 
 THANK YOU VERY MUCH
-
-<p align="left"><img src="https://thumbs.gfycat.com/ExemplaryFairFeline-max-1mb.gif"></p>
-
 
 [![Watch the video](https://github.com/alvaro-saez/ih_datamadpt1121_project_m1/blob/main/datasets/code_img/imghack.png)](https://www.youtube.com/watch?v=qol2X_8JF9I)
