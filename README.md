@@ -573,4 +573,4 @@ THANK YOU VERY MUCH
 <p align="left"><img src="https://thumbs.gfycat.com/ExemplaryFairFeline-max-1mb.gif"></p>
 
 
-[![Watch the video](https://img.youtube.com/vi/T-D1KVIuvjA/maxresdefault.jpg)](https://www.youtube.com/watch?v=qol2X_8JF9I)
+[![Watch the video](https://github.com/alvaro-saez/ih_datamadpt1121_project_m1/blob/main/datasets/code_img/imghack.png)](https://www.youtube.com/watch?v=qol2X_8JF9I)
