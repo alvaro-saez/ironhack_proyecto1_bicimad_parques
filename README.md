@@ -93,7 +93,7 @@ The API code would be the next one:
    json_parques_df = pd.json_normalize(json_parques)
    
 The final csv is:
-<p align="left"><img src="https://cdn-images-1.medium.com/max/184/1*2GDcaeYIx_bQAZLxWM4PsQ@2x.png"></p>
+<p align="left"><img src="https://github.com/alvaro-saez/ih_datamadpt1121_project_m1/blob/main/datasets/code_img/ac1.png"></p>
 
 
 
