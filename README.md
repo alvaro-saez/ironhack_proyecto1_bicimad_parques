@@ -87,7 +87,38 @@ The interaction is expressed using inputs method and ARPARSE, which allows to us
 
 The libraries imported are:
 
-<p align="left"><img src="https://github.com/alvaro-saez/ih_datamadpt1121_project_m1/blob/main/datasets/code_img/libraries.png"></p>
+- import pandas as pd
+- from shapely.geometry import Point
+- import geopandas as gpd   # conda install -c conda-forge geopandas
+- import numpy as np
+- import requests
+- import argparse
+- import warnings
+- warnings.filterwarnings('ignore')
+
+- import email, smtplib, ssl
+
+- from email import encoders
+- from email.mime.base import MIMEBase
+- from email.mime.multipart import MIMEMultipart
+- from email.mime.text import MIMEText
+
+- import webbrowser
+
+- import osmnx as ox
+- import folium
+
+- import gtts
+- from playsound import playsound
+- import pyttsx3
+
+- import fuzzywuzzy
+- from fuzzywuzzy import fuzz
+- from fuzzywuzzy import process
+
+- from tabulate import tabulate
+
+- from p_reporting import p_reporting as rp
 
 You can see all the code in the differents modules. It is explained with comments. 
 
