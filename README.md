@@ -91,10 +91,9 @@ The libraries imported are:
 
 You can see all the code in the differents modules. It is explained with comments. 
 
-The next code belongs to the main user script (wikiparque.py") which establishes the interaction with the user
+The INTERACTION with the user is expressed with the next code (it belongs to the main user script "wikiparque.py")
 
-def argument_parser():
-    parser = argparse.ArgumentParser(description='comandos para obtener información de tus parques favoritos',add_help=False)
+PARSER ARGUMENTS
     
     #THE PARSER ARGUMENT WHICH THE USER HAS
     parser.add_argument("-help", "--help_app_used", help="restaurantes cerca de tu parque favorito", action='store_true')
