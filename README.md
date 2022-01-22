@@ -551,24 +551,6 @@ def main(arguments):
         engine.say(error_wrong_command);
         engine.runAndWait(); 
         
-# Pipeline execution
-
-if __name__ == '__main__':
-    #TO HANDLING ERRORS WE USE TRY, EXCEPT AND ELSE, MINIMIZING CODE AND INCREASING THE USER EXPERIENCE
-    try:
-        main(argument_parser())
-    except:
-        error_command_locoo = "¡LOCO, Comando mal escrito! ¡ESTATE ATENTO!, Escribe 'python wikiparque.py -help' para volver a ver el conjunto de comandos"
-        print(error_command_locoo)
-        engine = pyttsx3.init(); #for voice command
-        engine.say(error_command_locoo);
-        engine.runAndWait();
-    else:
-        disfruta_del_parque_voice = "disfruta del parque"
-        print(disfruta_del_parque_voice)
-        engine = pyttsx3.init(); #for voice command
-        engine.say(disfruta_del_parque_voice);
-        engine.runAndWait();
 
 THANK YOU VERY MUCH
 
